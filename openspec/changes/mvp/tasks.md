@@ -43,22 +43,22 @@ Chain strategy: feature-branch-chain
 
 ## Phase 2: Data Layer (Batch 2 — PR 2)
 
-- [ ] **T006** Customer repository | `src/db/repositories/customerRepository.ts` | ~100 lines | Deps: T002, T003, T004 | Priority: high
+- [x] **T006** Customer repository | `src/db/repositories/customerRepository.ts` | ~100 lines | Deps: T002, T003, T004 | Priority: high
   - list (search), getById, create, update, delete (cascade check).
-- [ ] **T007** Vehicle repository | `src/db/repositories/vehicleRepository.ts` | ~110 lines | Deps: T002–T004 | Priority: high
+- [x] **T007** Vehicle repository | `src/db/repositories/vehicleRepository.ts` | ~110 lines | Deps: T002–T004 | Priority: high
   - CRUD + getTimeline (chronological work orders for a vehicle). License plate uppercase. Restrict delete if WOs exist.
-- [ ] **T008** Quote repository | `src/db/repositories/quoteRepository.ts` | ~130 lines | Deps: T002–T004 | Priority: high
+- [x] **T008** Quote repository | `src/db/repositories/quoteRepository.ts` | ~130 lines | Deps: T002–T004 | Priority: high
   - CRUD + auto-number (Q-YYYYMMDD-NNN) + convert() creates work order, sets status=converted. total_cost calc.
-- [ ] **T009** Work order repository | `src/db/repositories/workOrderRepository.ts` | ~160 lines | Deps: T002–T004 | Priority: high
+- [x] **T009** Work order repository | `src/db/repositories/workOrderRepository.ts` | ~160 lines | Deps: T002–T004 | Priority: high
   - CRUD + auto-number (WO-YYYYMMDD-NNN) + line item CRUD + total_cost calc + payment_status recalc. Mileage validation.
-- [ ] **T010** Payment repository | `src/db/repositories/paymentRepository.ts` | ~80 lines | Deps: T002–T004 | Priority: high
+- [x] **T010** Payment repository | `src/db/repositories/paymentRepository.ts` | ~80 lines | Deps: T002–T004 | Priority: high
   - listByWorkOrder, create, update, delete. Triggers WO payment_status recalc. Lock edits when WO paid.
-- [ ] **T011** Settings repository | `src/db/repositories/settingsRepository.ts` | ~40 lines | Deps: T002–T004 | Priority: medium
+- [x] **T011** Settings repository | `src/db/repositories/settingsRepository.ts` | ~40 lines | Deps: T002–T004 | Priority: medium
   - getAll (key→value map), update(key, value).
-- [ ] **T012** IPC handlers | `src/main/ipc/handlers.ts` | ~200 lines | Deps: T006–T011 | Priority: high
-  - Register ipcMain.handle for all repo methods. Wire to `registerAllHandlers(db)`.
-- [ ] **T013** Preload bridge | `src/preload/index.ts` | ~80 lines | Deps: T002, T012 | Priority: high
-  - contextBridge exposes `window.wrenchify` matching WrenchifyAPI interface.
+- [x] **T012** IPC handlers | `src/main/ipc/handlers.ts` | ~200 lines | Deps: T006–T011 | Priority: high
+  - Register ipcMain.handle for all repo methods. Wire to `registerAllHandlers()`.
+- [x] **T013** Preload bridge | `src/preload/index.ts` | ~80 lines | Deps: T002, T012 | Priority: high
+  - contextBridge exposes `window.wrenchifyAPI` matching WrenchifyAPI interface.
 
 **Batch 2 total: ~900 lines**
 
