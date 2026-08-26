@@ -1,0 +1,29 @@
+appId: com.looreenz.wrenchify
+productName: Wrenchify
+copyright: Copyright © 2026 Lorenzo
+directories:
+  output: dist
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+extraResources:
+  - from: src/db/migrations
+    to: db/migrations
+    filter:
+      - "**/*"
+mac:
+  category: public.app-category.business
+  target:
+    - dmg
+win:
+  target:
+    - nsis
+linux:
+  target:
+    - AppImage
+  category: Office
+publish:
+  provider: github
+  owner: looreenz
+  repo: wrenchify
