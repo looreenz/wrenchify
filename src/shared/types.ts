@@ -8,6 +8,12 @@ export type PaymentMethod = 'cash' | 'card' | 'transfer'
 
 export type WorkOrderItemType = 'parts' | 'labor'
 
+export type SettingKey =
+  | 'hourly_rate'
+  | 'default_language'
+  | 'shop_name'
+  | 'currency'
+
 export interface Customer {
   id: number
   first_name: string | null
@@ -22,6 +28,36 @@ export interface Customer {
   updated_at: string
 }
 
+export interface CustomerCreate {
+  first_name?: string | null
+  last_name: string
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  fiscal_code?: string | null
+  notes?: string | null
+  preferred_language?: Language
+}
+
+export interface CustomerUpdate {
+  first_name?: string | null
+  last_name?: string
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+  fiscal_code?: string | null
+  notes?: string | null
+  preferred_language?: Language
+}
+
+export interface CustomerFilter {
+  search?: string
+}
+
+export interface CustomerWithVehicleCount extends Customer {
+  vehicle_count: number
+}
+
 export interface Vehicle {
   id: number
   customer_id: number
@@ -33,6 +69,42 @@ export interface Vehicle {
   notes: string | null
   created_at: string
   updated_at: string
+}
+
+export interface VehicleCreate {
+  customer_id: number
+  license_plate: string
+  make?: string | null
+  model: string
+  year?: number | null
+  vin?: string | null
+  notes?: string | null
+}
+
+export interface VehicleUpdate {
+  customer_id?: number
+  license_plate?: string
+  make?: string | null
+  model?: string
+  year?: number | null
+  vin?: string | null
+  notes?: string | null
+}
+
+export interface VehicleFilter {
+  customer_id?: number
+}
+
+export interface VehicleTimelineEntry {
+  id: number
+  order_number: string
+  date_in: string
+  date_out: string | null
+  mileage_in: number | null
+  mileage_out: number | null
+  description: string | null
+  total_cost: number
+  payment_status: WorkOrderPaymentStatus
 }
 
 export interface Quote {
@@ -50,6 +122,35 @@ export interface Quote {
   notes: string | null
   created_at: string
   updated_at: string
+}
+
+export interface QuoteCreate {
+  vehicle_id: number
+  customer_id: number
+  date?: string
+  description?: string | null
+  labor_hours?: number
+  hourly_rate?: number
+  parts_cost?: number
+  notes?: string | null
+}
+
+export interface QuoteUpdate {
+  vehicle_id?: number
+  customer_id?: number
+  date?: string
+  description?: string | null
+  labor_hours?: number
+  hourly_rate?: number
+  parts_cost?: number
+  notes?: string | null
+  status?: QuoteStatus
+}
+
+export interface QuoteFilter {
+  customer_id?: number
+  vehicle_id?: number
+  status?: QuoteStatus
 }
 
 export interface WorkOrder {
@@ -73,6 +174,44 @@ export interface WorkOrder {
   updated_at: string
 }
 
+export interface WorkOrderCreate {
+  vehicle_id: number
+  customer_id: number
+  quote_id?: number | null
+  date_in?: string
+  date_out?: string | null
+  mileage_in?: number | null
+  mileage_out?: number | null
+  description?: string | null
+  labor_hours?: number
+  hourly_rate?: number
+  parts_cost?: number
+  notes?: string | null
+}
+
+export interface WorkOrderUpdate {
+  vehicle_id?: number
+  customer_id?: number
+  quote_id?: number | null
+  date_in?: string
+  date_out?: string | null
+  mileage_in?: number | null
+  mileage_out?: number | null
+  description?: string | null
+  labor_hours?: number
+  hourly_rate?: number
+  parts_cost?: number
+  notes?: string | null
+}
+
+export interface WorkOrderFilter {
+  customer_id?: number
+  vehicle_id?: number
+  date_from?: string
+  date_to?: string
+  payment_status?: WorkOrderPaymentStatus
+}
+
 export interface WorkOrderItem {
   id: number
   work_order_id: number
@@ -82,6 +221,20 @@ export interface WorkOrderItem {
   item_type: WorkOrderItemType
   created_at: string
   updated_at: string
+}
+
+export interface WorkOrderItemCreate {
+  description: string
+  quantity?: number
+  unit_price?: number
+  item_type?: WorkOrderItemType
+}
+
+export interface WorkOrderItemUpdate {
+  description?: string
+  quantity?: number
+  unit_price?: number
+  item_type?: WorkOrderItemType
 }
 
 export interface Payment {
@@ -95,11 +248,21 @@ export interface Payment {
   updated_at: string
 }
 
-export type SettingKey =
-  | 'hourly_rate'
-  | 'default_language'
-  | 'shop_name'
-  | 'currency'
+export interface PaymentCreate {
+  work_order_id: number
+  amount: number
+  payment_method: PaymentMethod
+  payment_date?: string
+  notes?: string | null
+}
+
+export interface PaymentUpdate {
+  work_order_id?: number
+  amount?: number
+  payment_method?: PaymentMethod
+  payment_date?: string
+  notes?: string | null
+}
 
 export interface Setting {
   key: SettingKey
@@ -113,18 +276,53 @@ export interface SettingsMap {
   currency: string
 }
 
-export interface CustomerWithVehicleCount extends Customer {
-  vehicle_count: number
-}
-
-export interface VehicleTimelineEntry {
-  id: number
-  order_number: string
-  date_in: string
-  date_out: string | null
-  mileage_in: number | null
-  mileage_out: number | null
-  description: string | null
-  total_cost: number
-  payment_status: WorkOrderPaymentStatus
+export interface WrenchifyAPI {
+  platform: string
+  versions: {
+    node: string
+    electron: string
+  }
+  customers: {
+    list: (search?: string) => Promise<CustomerWithVehicleCount[]>
+    getById: (id: number) => Promise<Customer | undefined>
+    create: (data: CustomerCreate) => Promise<Customer>
+    update: (id: number, data: CustomerUpdate) => Promise<Customer>
+    delete: (id: number) => Promise<void>
+  }
+  vehicles: {
+    list: (filter?: VehicleFilter) => Promise<Vehicle[]>
+    getById: (id: number) => Promise<Vehicle | undefined>
+    create: (data: VehicleCreate) => Promise<Vehicle>
+    update: (id: number, data: VehicleUpdate) => Promise<Vehicle>
+    delete: (id: number) => Promise<void>
+    getTimeline: (vehicleId: number) => Promise<VehicleTimelineEntry[]>
+  }
+  quotes: {
+    list: (filter?: QuoteFilter) => Promise<Quote[]>
+    getById: (id: number) => Promise<Quote | undefined>
+    create: (data: QuoteCreate) => Promise<Quote>
+    update: (id: number, data: QuoteUpdate) => Promise<Quote>
+    delete: (id: number) => Promise<void>
+    convert: (id: number) => Promise<WorkOrder>
+  }
+  workOrders: {
+    list: (filter?: WorkOrderFilter) => Promise<WorkOrder[]>
+    getById: (id: number) => Promise<WorkOrder | undefined>
+    create: (data: WorkOrderCreate) => Promise<WorkOrder>
+    update: (id: number, data: WorkOrderUpdate) => Promise<WorkOrder>
+    delete: (id: number) => Promise<void>
+    addLineItem: (workOrderId: number, data: WorkOrderItemCreate) => Promise<WorkOrderItem>
+    updateLineItem: (itemId: number, data: WorkOrderItemUpdate) => Promise<WorkOrderItem>
+    deleteLineItem: (itemId: number) => Promise<void>
+  }
+  payments: {
+    listByWorkOrder: (workOrderId: number) => Promise<Payment[]>
+    create: (data: PaymentCreate) => Promise<Payment>
+    update: (id: number, data: PaymentUpdate) => Promise<Payment>
+    delete: (id: number) => Promise<void>
+  }
+  settings: {
+    getAll: () => Promise<SettingsMap>
+    update: (key: SettingKey, value: string) => Promise<void>
+  }
 }
