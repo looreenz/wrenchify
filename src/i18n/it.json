@@ -1,0 +1,36 @@
+{
+  "app": {
+    "title": "Wrenchify",
+    "loading": "Caricamento in corso...",
+    "save": "Salva",
+    "cancel": "Annulla",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "create": "Crea",
+    "search": "Cerca",
+    "confirm": "Conferma"
+  },
+  "nav": {
+    "customers": "Clienti",
+    "vehicles": "Veicoli",
+    "quotes": "Preventivi",
+    "workOrders": "Ordini di lavoro",
+    "settings": "Impostazioni"
+  },
+  "customer": {
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "phone": "Telefono",
+    "email": "Email",
+    "address": "Indirizzo",
+    "fiscalCode": "Codice fiscale",
+    "notes": "Note"
+  },
+  "vehicle": {
+    "licensePlate": "Targa",
+    "make": "Marca",
+    "model": "Modello",
+    "year": "Anno",
+    "vin": "VIN"
+  }
+}
