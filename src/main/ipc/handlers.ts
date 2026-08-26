@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron'
+import { exportManualBackup, restoreFromBackup } from '../backup'
 import * as customerRepository from '../../db/repositories/customerRepository'
 import * as vehicleRepository from '../../db/repositories/vehicleRepository'
 import * as quoteRepository from '../../db/repositories/quoteRepository'
@@ -151,5 +152,13 @@ export function registerAllHandlers(): void {
 
   ipcMain.handle('settings:update', async (_event, key: SettingKey, value: string) => {
     return settingsRepository.update(key, value)
+  })
+
+  ipcMain.handle('backup:exportManual', async () => {
+    return exportManualBackup()
+  })
+
+  ipcMain.handle('backup:restore', async () => {
+    return restoreFromBackup()
   })
 }

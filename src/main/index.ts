@@ -2,8 +2,9 @@ import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { initializeDatabase } from '../db/connection'
 import { registerAllHandlers } from './ipc/handlers'
+import { isRestoring, runAutoBackup } from './backup'
 
-const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
+const isDev = process.env.NODE_ENV === 'development'
 
 let mainWindow: BrowserWindow | null = null
 
@@ -50,6 +51,19 @@ app.whenReady().then(async () => {
   }
 
   createWindow()
+})
+
+app.on('before-quit', () => {
+  if (isRestoring()) {
+    return
+  }
+
+  try {
+    const backupPath = runAutoBackup()
+    console.log('[main] Auto-backup created:', backupPath)
+  } catch (error) {
+    console.error('[main] Auto-backup failed:', error)
+  }
 })
 
 app.on('window-all-closed', () => {

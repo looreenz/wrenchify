@@ -50,6 +50,10 @@ const api: WrenchifyAPI = {
   settings: {
     getAll: () => ipcRenderer.invoke('settings:getAll'),
     update: (key, value) => ipcRenderer.invoke('settings:update', key, value)
+  },
+  backup: {
+    exportManual: () => ipcRenderer.invoke('backup:exportManual'),
+    restore: () => ipcRenderer.invoke('backup:restore')
   }
 }
 

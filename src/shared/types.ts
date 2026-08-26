@@ -326,4 +326,14 @@ export interface WrenchifyAPI {
     getAll: () => Promise<SettingsMap>
     update: (key: SettingKey, value: string) => Promise<void>
   }
+  backup: {
+    exportManual: () => Promise<BackupResult>
+    restore: () => Promise<BackupResult>
+  }
+}
+
+export interface BackupResult {
+  success: boolean
+  path?: string
+  error?: string
 }
