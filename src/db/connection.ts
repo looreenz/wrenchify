@@ -40,6 +40,10 @@ export function closeDatabase(): void {
   }
 }
 
+export function setDatabase(database: Database.Database): void {
+  db = database
+}
+
 function getMigrationsDirectory(): string {
   if (app.isPackaged) {
     return join(process.resourcesPath, 'db/migrations')
