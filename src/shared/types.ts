@@ -311,6 +311,7 @@ export interface WrenchifyAPI {
     create: (data: WorkOrderCreate) => Promise<WorkOrder>
     update: (id: number, data: WorkOrderUpdate) => Promise<WorkOrder>
     delete: (id: number) => Promise<void>
+    getLineItems: (workOrderId: number) => Promise<WorkOrderItem[]>
     addLineItem: (workOrderId: number, data: WorkOrderItemCreate) => Promise<WorkOrderItem>
     updateLineItem: (itemId: number, data: WorkOrderItemUpdate) => Promise<WorkOrderItem>
     deleteLineItem: (itemId: number) => Promise<void>

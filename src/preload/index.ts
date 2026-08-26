@@ -36,6 +36,7 @@ const api: WrenchifyAPI = {
     create: (data) => ipcRenderer.invoke('workOrders:create', data),
     update: (id, data) => ipcRenderer.invoke('workOrders:update', id, data),
     delete: (id) => ipcRenderer.invoke('workOrders:delete', id),
+    getLineItems: (workOrderId) => ipcRenderer.invoke('workOrders:getLineItems', workOrderId),
     addLineItem: (workOrderId, data) => ipcRenderer.invoke('workOrders:addLineItem', workOrderId, data),
     updateLineItem: (itemId, data) => ipcRenderer.invoke('workOrders:updateLineItem', itemId, data),
     deleteLineItem: (itemId) => ipcRenderer.invoke('workOrders:deleteLineItem', itemId)

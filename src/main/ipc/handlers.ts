@@ -113,6 +113,10 @@ export function registerAllHandlers(): void {
     return workOrderRepository.remove(id)
   })
 
+  ipcMain.handle('workOrders:getLineItems', async (_event, workOrderId: number) => {
+    return workOrderRepository.getLineItems(workOrderId)
+  })
+
   ipcMain.handle('workOrders:addLineItem', async (_event, workOrderId: number, data: WorkOrderItemCreate) => {
     return workOrderRepository.addLineItem(workOrderId, data)
   })

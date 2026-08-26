@@ -49,6 +49,10 @@ export const useWorkOrderStore = defineStore('workOrders', () => {
     await load()
   }
 
+  async function getLineItems(workOrderId: number): Promise<WorkOrderItem[]> {
+    return window.wrenchifyAPI.workOrders.getLineItems(workOrderId)
+  }
+
   async function addLineItem(
     workOrderId: number,
     data: WorkOrderItemCreate
@@ -81,6 +85,7 @@ export const useWorkOrderStore = defineStore('workOrders', () => {
     create,
     update,
     remove,
+    getLineItems,
     addLineItem,
     updateLineItem,
     deleteLineItem
