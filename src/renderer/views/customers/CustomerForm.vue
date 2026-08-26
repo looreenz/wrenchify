@@ -234,7 +234,7 @@ function makePayload(): CustomerCreate {
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: var(--bi-space-3);
 }
 
 .page-header h1 {
@@ -243,20 +243,20 @@ function makePayload(): CustomerCreate {
 }
 
 .form {
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 8px;
+  background-color: var(--bi-surface-container-low);
+  padding: var(--bi-space-3);
+  border-radius: var(--bi-radius-lg);
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--bi-space-2);
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--bi-space-2);
+  margin-top: var(--bi-space-3);
 }
 </style>
