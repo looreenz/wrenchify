@@ -1,6 +1,7 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'path'
 import { initializeDatabase } from '../db/connection'
+import { registerAllHandlers } from './ipc/handlers'
 
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
 
@@ -42,6 +43,7 @@ function createWindow(): void {
 app.whenReady().then(async () => {
   try {
     await initializeDatabase()
+    registerAllHandlers()
     console.log('[main] Database initialized')
   } catch (error) {
     console.error('[main] Failed to initialize database:', error)
