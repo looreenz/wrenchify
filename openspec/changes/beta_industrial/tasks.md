@@ -103,9 +103,9 @@ Chain strategy: stacked-to-main
 
 - [x] 10.1 Replace generic components with IndustrialCard in VehicleList where appropriate. Acceptance: Vehicles wrapped in IndustrialCard. Effort: 1h. Risk: Low.
 - [x] 10.2 Replace delete actions with HazardButton in CustomerForm, VehicleForm, QuoteForm. Acceptance: Delete buttons show striped hover. Effort: 1.5h. Risk: Low.
-- [ ] 10.3 Hardcoded color audit: `grep -rE '#[0-9a-fA-F]{3,8}' src/renderer/views/ src/renderer/layouts/` returns zero matches (excluding comments). Acceptance: Zero hardcoded colors. Effort: 1h. Risk: Low.
-- [ ] 10.4 Visual consistency audit: verify all views use tokens, check contrast ratios. Acceptance: All text ≥ 4.5:1 contrast. Effort: 2h. Risk: Low.
-- [ ] 10.5 Update documentation: add theme system docs, component usage examples. Acceptance: Docs explain token system and custom components. Effort: 2h. Risk: Low.
+- [x] 10.3 Hardcoded color audit: `grep -rE '#[0-9a-fA-F]{3,8}' src/renderer/views/ src/renderer/layouts/` returns zero matches (excluding comments). Acceptance: Zero hardcoded colors. Effort: 1h. Risk: Low.
+- [x] 10.4 Visual consistency audit: verify all views use tokens, check contrast ratios. Acceptance: All text ≥ 4.5:1 contrast. Effort: 2h. Risk: Low.
+- [x] 10.5 Update documentation: add theme system docs, component usage examples. Acceptance: Docs explain token system and custom components. Effort: 2h. Risk: Low.
 
 **Phase 10 total: ~7.5h**
 
