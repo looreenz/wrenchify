@@ -9,11 +9,11 @@
 | Chained PRs recommended | Yes |
 | Suggested split | PR 1 → PR 2 → PR 3 → PR 4 → PR 5 |
 | Delivery strategy | ask-on-risk |
-| Chain strategy | pending (user decision required) |
+| Chain strategy | feature-branch-chain |
 
-Decision needed before apply: Yes
+Decision needed before apply: Yes (resolved: feature-branch-chain)
 Chained PRs recommended: Yes
-Chain strategy: pending
+Chain strategy: feature-branch-chain
 400-line budget risk: High
 
 ### Suggested Work Units
@@ -28,15 +28,15 @@ Chain strategy: pending
 
 ## Phase 1: Foundation (Batch 1 — PR 1)
 
-- [ ] **T001** Project scaffolding | `package.json`, `vite.config.ts`, `tsconfig.json`, `electron-builder.yml`, `src/main/index.ts` | ~170 lines | Deps: none | Priority: high
+- [x] **T001** Project scaffolding | `package.json`, `electron.vite.config.ts`, `tsconfig.json`, `electron-builder.yml`, `src/main/index.ts` | ~170 lines | Deps: none | Priority: high
   - Electron + Vue 3 + Vite + TypeScript config. Dev + build scripts. Basic main process window creation.
-- [ ] **T002** Shared TypeScript types | `src/shared/types.ts` | ~120 lines | Deps: T001 | Priority: high
+- [x] **T002** Shared TypeScript types | `src/shared/types.ts` | ~120 lines | Deps: T001 | Priority: high
   - All interfaces: Customer, Vehicle, Quote, WorkOrder, WorkOrderItem, Payment, Settings, plus Create/Update variants and filter types.
-- [ ] **T003** Database connection + migration runner | `src/db/connection.ts` | ~60 lines | Deps: T001 | Priority: high
+- [x] **T003** Database connection + migration runner | `src/db/connection.ts` | ~60 lines | Deps: T001 | Priority: high
   - better-sqlite3 init, WAL mode, `runMigrations()` that reads `migrations/*.sql` in order.
-- [ ] **T004** Initial schema migration | `src/db/migrations/001_initial.sql` | ~80 lines | Deps: T003 | Priority: high
+- [x] **T004** Initial schema migration | `src/db/migrations/001_initial.sql` | ~80 lines | Deps: T003 | Priority: high
   - 7 tables (customers, vehicles, quotes, work_orders, work_order_items, payments, settings), indexes, seed defaults.
-- [ ] **T005** i18n setup | `src/i18n/index.ts`, `src/i18n/it.json`, `src/i18n/es.json` | ~40 lines | Deps: T001 | Priority: high
+- [x] **T005** i18n setup | `src/i18n/index.ts`, `src/i18n/it.json`, `src/i18n/es.json` | ~40 lines | Deps: T001 | Priority: high
   - vue-i18n Composition API init, locale loader, skeleton dictionaries with app-level keys only.
 
 **Batch 1 total: ~470 lines**
