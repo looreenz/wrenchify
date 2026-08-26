@@ -11,7 +11,18 @@
       @expand="collapsed = false"
     >
       <div class="sidebar-header">
-        <span v-if="!collapsed" class="sidebar-title">{{ $t('app.title') }}</span>
+        <img
+          v-if="collapsed"
+          :src="isotipoImg"
+          alt="Wrenchify"
+          class="sidebar-logo-isotipo"
+        />
+        <img
+          v-else
+          :src="logotipoImg"
+          alt="Wrenchify"
+          class="sidebar-logo"
+        />
       </div>
       <n-menu
         :collapsed="collapsed"
@@ -48,6 +59,8 @@ import {
   Settings
 } from 'lucide-vue-next'
 import type { MenuOption } from 'naive-ui'
+import logotipoImg from '../assets/wrenchify-light-theme-transparent.png'
+import isotipoImg from '../assets/logo-light-theme-transparent.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -113,17 +126,21 @@ const menuOptions = computed<MenuOption[]>(() => [
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 56px;
+  height: 80px;
   padding: 0 16px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.sidebar-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.sidebar-logo {
+  width: 180px;
+  height: auto;
+  object-fit: contain;
+}
+
+.sidebar-logo-isotipo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
 }
 
 .main-content {
