@@ -144,6 +144,14 @@
       "mileageOutGreater": "I km di uscita devono essere maggiori o uguali a quelli di ingresso"
     }
   },
+  "lineItem": {
+    "description": "Descrizione",
+    "quantity": "Quantità",
+    "unitPrice": "Prezzo unitario",
+    "type": "Tipo",
+    "typeParts": "Ricambi",
+    "typeLabor": "Lavoro"
+  },
   "payment": {
     "title": "Pagamenti",
     "amount": "Importo",
