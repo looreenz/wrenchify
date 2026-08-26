@@ -61,17 +61,17 @@ Chain strategy: stacked-to-main
 
 ## Phase 5: Vehicle Views (Depends on Phase 3, parallel with Phase 4)
 
-- [ ] 5.1 Modify `src/renderer/views/vehicles/VehicleList.vue`: replace hardcoded colors, wrap each vehicle in IndustrialCard (create component in Phase 7 if not ready). Acceptance: Zero hex colors, plate/VIN in `--bi-font-mono`. Effort: 2h. Risk: Low.
-- [ ] 5.2 Modify `src/renderer/views/vehicles/VehicleForm.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
-- [ ] 5.3 Modify `src/renderer/views/vehicles/VehicleTimeline.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1h. Risk: Low.
+- [x] 5.1 Modify `src/renderer/views/vehicles/VehicleList.vue`: replace hardcoded colors, wrap each vehicle in IndustrialCard (create component in Phase 7 if not ready). Acceptance: Zero hex colors, plate/VIN in `--bi-font-mono`. Effort: 2h. Risk: Low.
+- [x] 5.2 Modify `src/renderer/views/vehicles/VehicleForm.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
+- [x] 5.3 Modify `src/renderer/views/vehicles/VehicleTimeline.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1h. Risk: Low.
 
 **Phase 5 total: ~4.5h**
 
 ## Phase 6: Quote Views (Depends on Phase 3, parallel with Phase 4-5)
 
-- [ ] 6.1 Modify `src/renderer/views/quotes/QuoteList.vue`: replace hardcoded colors, add StatusLamp for quote status (draft=tertiary, accepted=emerald, rejected=error, converted=primary-container). Acceptance: Zero hex colors, status lamps render with correct colors. Effort: 2.5h. Risk: Medium (StatusLamp integration).
-- [ ] 6.2 Modify `src/renderer/views/quotes/QuoteDetail.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
-- [ ] 6.3 Modify `src/renderer/views/quotes/QuoteForm.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
+- [x] 6.1 Modify `src/renderer/views/quotes/QuoteList.vue`: replace hardcoded colors, add StatusLamp for quote status (draft=tertiary, accepted=emerald, rejected=error, converted=primary-container). Acceptance: Zero hex colors, status lamps render with correct colors. Effort: 2.5h. Risk: Medium (StatusLamp integration).
+- [x] 6.2 Modify `src/renderer/views/quotes/QuoteDetail.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
+- [x] 6.3 Modify `src/renderer/views/quotes/QuoteForm.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
 
 **Phase 6 total: ~5.5h**
 
