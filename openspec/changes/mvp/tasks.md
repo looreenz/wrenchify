@@ -87,19 +87,19 @@ Chain strategy: feature-branch-chain
 
 ## Phase 4: Business Features (Batch 4 — PR 4)
 
-- [ ] **T023** Quote list view | `src/renderer/views/quotes/QuoteList.vue` | ~110 lines | Deps: T015–T017 | Priority: high
+- [x] **T023** Quote list view | `src/renderer/views/quotes/QuoteList.vue` | ~110 lines | Deps: T015–T017 | Priority: high
   - DataTable with status badges (draft/accepted/rejected/converted). Filters.
-- [ ] **T024** Quote form view | `src/renderer/views/quotes/QuoteForm.vue` | ~160 lines | Deps: T015–T017 | Priority: high
+- [x] **T024** Quote form view | `src/renderer/views/quotes/QuoteForm.vue` | ~160 lines | Deps: T015–T017 | Priority: high
   - Vehicle/customer selection. hourly_rate pre-filled from settings (editable). Auto total_cost. Read-only if non-draft.
-- [ ] **T025** Quote detail + conversion | `src/renderer/views/quotes/QuoteDetail.vue` | ~80 lines | Deps: T015–T017 | Priority: high
+- [x] **T025** Quote detail + conversion | `src/renderer/views/quotes/QuoteDetail.vue` | ~80 lines | Deps: T015–T017 | Priority: high
   - Display quote. Accept/reject buttons. Convert button (creates WO, redirects).
-- [ ] **T026** Work order list view | `src/renderer/views/work-orders/WorkOrderList.vue` | ~120 lines | Deps: T015–T017 | Priority: high
+- [x] **T026** Work order list view | `src/renderer/views/work-orders/WorkOrderList.vue` | ~120 lines | Deps: T015–T017 | Priority: high
   - Filters: date range, payment_status, customer. Payment status badges.
-- [ ] **T027** Work order form view | `src/renderer/views/work-orders/WorkOrderForm.vue` | ~180 lines | Deps: T015–T017 | Priority: high
+- [x] **T027** Work order form view | `src/renderer/views/work-orders/WorkOrderForm.vue` | ~180 lines | Deps: T015–T017 | Priority: high
   - Full form: vehicle, dates, mileage (validation), labor, parts, hourly_rate. Line items editor integration.
-- [ ] **T028** Line items editor component | `src/renderer/components/LineItemsEditor.vue` | ~150 lines | Deps: T015, T016 | Priority: high
+- [x] **T028** Line items editor component | `src/renderer/components/LineItemsEditor.vue` | ~150 lines | Deps: T015, T016 | Priority: high
   - Add/edit/delete line items (description, qty, unit_price, type). Running total. Reusable within WO form.
-- [ ] **T029** Payment tracking section | `src/renderer/views/work-orders/PaymentSection.vue` | ~130 lines | Deps: T015–T017 | Priority: high
+- [x] **T029** Payment tracking section | `src/renderer/views/work-orders/PaymentSection.vue` | ~130 lines | Deps: T015–T017 | Priority: high
   - Payment list with running total + remaining balance. Add/edit/delete forms. Lock when WO paid.
 
 **Batch 4 total: ~930 lines**
