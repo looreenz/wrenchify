@@ -106,15 +106,15 @@ Chain strategy: feature-branch-chain
 
 ## Phase 5: Settings, Backup & Testing (Batch 5 — PR 5)
 
-- [ ] **T030** Settings view | `src/renderer/views/settings/SettingsView.vue` | ~100 lines | Deps: T015–T017 | Priority: medium
+- [x] **T030** Settings view | `src/renderer/views/settings/SettingsView.vue` | ~100 lines | Deps: T015–T017 | Priority: medium
   - Form: hourly_rate, default_language (select IT/ES), shop_name. Immediate effect via Pinia.
-- [ ] **T031** Auto-backup on close | `src/main/backup.ts`, update `src/main/index.ts` | ~90 lines | Deps: T003 | Priority: medium
+- [x] **T031** Auto-backup on close | `src/main/backup.ts`, update `src/main/index.ts` | ~90 lines | Deps: T003 | Priority: medium
   - WAL checkpoint → copy SQLite to `{userData}/backups/` → FIFO rotation (keep last 3). Hook into app before-quit.
-- [ ] **T032** Manual export/restore | update `src/main/backup.ts`, `src/main/ipc/handlers.ts` | ~70 lines | Deps: T031 | Priority: medium
+- [x] **T032** Manual export/restore | update `src/main/backup.ts`, `src/main/ipc/handlers.ts` | ~70 lines | Deps: T031 | Priority: medium
   - Export: Save As dialog. Restore: file picker → confirm → validate SQLite → replace DB → reload.
-- [ ] **T033** Vitest setup + repo unit tests | `vitest.config.ts`, `tests/unit/repositories.test.ts` | ~220 lines | Deps: T006–T011 | Priority: medium
+- [x] **T033** Vitest setup + repo unit tests | `vitest.config.ts`, `tests/unit/repositories.test.ts` | ~220 lines | Deps: T006–T011 | Priority: medium
   - In-memory SQLite. Test all repo CRUD, auto-numbers, total_cost calc, payment_status, quote conversion.
-- [ ] **T034** Playwright setup + E2E smoke test | `playwright.config.ts`, `tests/e2e/smoke.spec.ts` | ~130 lines | Deps: T014–T029 | Priority: low
+- [x] **T034** Playwright setup + E2E smoke test | `playwright.config.ts`, `tests/e2e/smoke.spec.ts` | ~130 lines | Deps: T014–T029 | Priority: low
   - Config for Electron. Smoke test: create customer → vehicle → quote → convert → add payment.
 
 **Batch 5 total: ~610 lines**
