@@ -23,4 +23,15 @@ body {
 * {
   box-sizing: border-box;
 }
+
+/* Override Naive UI error buttons with intense red */
+.n-button--error-type {
+  --n-text-color: #ef4444 !important;
+  --n-border: 1px solid #ef4444 !important;
+  --n-border-hover: 1px solid #ef4444 !important;
+  --n-border-pressed: 1px solid #ef4444 !important;
+  --n-border-focus: 1px solid #ef4444 !important;
+  --n-color-hover: rgba(239, 68, 68, 0.08) !important;
+  --n-color-pressed: rgba(239, 68, 68, 0.12) !important;
+}
 </style>

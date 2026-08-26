@@ -83,7 +83,8 @@
       "created": "Vehículo creado",
       "updated": "Vehículo actualizado",
       "deleted": "Vehículo eliminado",
-      "deleteConfirm": "¿Eliminar el vehículo? Las órdenes de trabajo asociadas impedirán la eliminación."
+      "deleteConfirm": "¿Eliminar el vehículo? Las órdenes de trabajo asociadas impedirán la eliminación.",
+      "cannotDeleteWithWorkOrders": "No se puede eliminar el vehículo: existen órdenes de trabajo asociadas. Elimina primero las órdenes de trabajo."
     }
   },
   "quote": {

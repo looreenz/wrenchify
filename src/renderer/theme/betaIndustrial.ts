@@ -3,44 +3,44 @@ import type { GlobalThemeOverrides } from 'naive-ui'
 /**
  * Naive UI GlobalThemeOverrides for the Beta Industrial theme.
  *
- * Maps CSS design tokens to Naive UI component variables so the entire
- * component library inherits the dark, high-contrast workshop aesthetic.
+ * Uses literal hex values (not CSS variables) because Naive UI's
+ * GlobalThemeOverrides object doesn't resolve var() references.
  */
 export const betaIndustrialOverrides: GlobalThemeOverrides = {
   common: {
-    primaryColor: 'var(--bi-primary-container)',
-    primaryColorHover: 'var(--bi-primary)',
-    primaryColorPressed: 'var(--bi-inverse-primary)',
-    primaryColorSuppl: 'var(--bi-primary)',
+    primaryColor: '#ff6b00',
+    primaryColorHover: '#ffb693',
+    primaryColorPressed: '#a04100',
+    primaryColorSuppl: '#ffb693',
 
-    errorColor: 'var(--bi-error)',
-    warningColor: 'var(--bi-hazard-yellow)',
-    successColor: 'var(--bi-success)',
+    errorColor: '#ffb4ab',
+    warningColor: '#fde047',
+    successColor: '#4ade80',
 
-    textColorBase: 'var(--bi-on-surface)',
-    textColor1: 'var(--bi-on-surface)',
-    textColor2: 'var(--bi-secondary)',
-    textColor3: 'var(--bi-outline)',
+    textColorBase: '#dae2fd',
+    textColor1: '#dae2fd',
+    textColor2: '#b9c7e0',
+    textColor3: '#a98a7d',
 
-    bodyColor: 'var(--bi-surface)',
-    cardColor: 'var(--bi-surface-container)',
-    modalColor: 'var(--bi-surface-container)',
-    popoverColor: 'var(--bi-surface-container-high)',
-    tableColor: 'var(--bi-surface-container)',
-    inputColor: 'var(--bi-surface-container-low)',
-    actionColor: 'var(--bi-surface-container-high)',
+    bodyColor: '#0b1326',
+    cardColor: '#171f33',
+    modalColor: '#171f33',
+    popoverColor: '#222a3d',
+    tableColor: '#171f33',
+    inputColor: '#131b2e',
+    actionColor: '#222a3d',
 
-    hoverColor: 'var(--bi-primary-container-alpha-9)',
-    borderColor: 'var(--bi-outline)',
-    dividerColor: 'var(--bi-slate-gray)',
+    hoverColor: 'rgba(255, 107, 0, 0.09)',
+    borderColor: '#a98a7d',
+    dividerColor: '#334155',
 
-    borderRadius: 'var(--bi-radius)',
-    borderRadiusSmall: 'var(--bi-radius-sm)',
+    borderRadius: '4px',
+    borderRadiusSmall: '2px',
 
-    fontFamily: 'var(--bi-font-sans)',
-    fontFamilyMono: 'var(--bi-font-mono)',
+    fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
+    fontFamilyMono: "ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', monospace",
 
-    heightMedium: 'var(--bi-touch-target)'
+    heightMedium: '52px'
   },
 
   Button: {
@@ -48,28 +48,28 @@ export const betaIndustrialOverrides: GlobalThemeOverrides = {
   },
 
   DataTable: {
-    thColor: 'var(--bi-surface-container-high)',
-    tdColor: 'var(--bi-surface-container)',
-    thTextColor: 'var(--bi-on-surface)',
-    tdTextColor: 'var(--bi-on-surface)',
-    borderColor: 'var(--bi-slate-gray)',
-    borderRadius: 'var(--bi-radius)'
+    thColor: '#222a3d',
+    tdColor: '#171f33',
+    thTextColor: '#dae2fd',
+    tdTextColor: '#dae2fd',
+    borderColor: '#334155',
+    borderRadius: '4px'
   },
 
   Input: {
-    color: 'var(--bi-surface-container-low)',
-    borderHover: 'var(--bi-primary-container)',
-    borderFocus: 'var(--bi-primary-container)',
-    boxShadowFocus: '0 0 0 2px var(--bi-primary-container-alpha-20)'
+    color: '#131b2e',
+    borderHover: '#ff6b00',
+    borderFocus: '#ff6b00',
+    boxShadowFocus: '0 0 0 2px rgba(255, 107, 0, 0.2)'
   },
 
   Menu: {
-    color: 'var(--bi-surface)',
-    itemColorActive: 'var(--bi-surface-container-high)',
-    itemColorActiveHover: 'var(--bi-surface-container-highest)',
-    itemTextColor: 'var(--bi-on-surface)',
-    itemTextColorActive: 'var(--bi-primary-container)',
-    itemIconColor: 'var(--bi-on-surface)',
-    itemIconColorActive: 'var(--bi-primary-container)'
+    color: '#0b1326',
+    itemColorActive: '#222a3d',
+    itemColorActiveHover: '#2d3449',
+    itemTextColor: '#dae2fd',
+    itemTextColorActive: '#ff6b00',
+    itemIconColor: '#dae2fd',
+    itemIconColorActive: '#ff6b00'
   }
 }

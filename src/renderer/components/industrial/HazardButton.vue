@@ -44,27 +44,27 @@ function handleClick(event: MouseEvent): void {
   align-items: center;
   justify-content: center;
   gap: var(--bi-space-1);
-  border: none;
+  border: 2px solid #ef4444;
   border-radius: var(--bi-radius);
   font: var(--bi-label-bold);
   letter-spacing: var(--bi-label-bold-letter-spacing);
   text-transform: uppercase;
-  color: var(--bi-on-error);
-  background-color: var(--bi-error-container);
+  color: #ef4444;
+  background-color: transparent;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
+  transition: background-image 0.2s ease, transform 0.1s ease;
 }
 
 .hazard-button:hover:not(:disabled) {
   background-image: repeating-linear-gradient(
     45deg,
-    var(--bi-hazard-yellow) 0,
-    var(--bi-hazard-yellow) 8px,
-    var(--bi-charcoal-black) 8px,
-    var(--bi-charcoal-black) 16px
+    rgba(253, 224, 71, 0.15) 0,
+    rgba(253, 224, 71, 0.15) 8px,
+    rgba(15, 23, 42, 0.15) 8px,
+    rgba(15, 23, 42, 0.15) 16px
   );
-  background-color: var(--bi-error-container);
-  color: var(--bi-on-warning);
+  border-color: #ef4444;
+  color: #ef4444;
 }
 
 .hazard-button:active:not(:disabled) {
