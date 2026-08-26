@@ -77,32 +77,32 @@ Chain strategy: stacked-to-main
 
 ## Phase 7: Custom Components (Depends on Phase 1, build alongside Phase 5-6)
 
-- [ ] 7.1 Create `src/renderer/components/industrial/StatusLamp.vue` with props: color, size (sm/md/lg), label, pulse. Acceptance: Renders glowing circle with box-shadow, pulse animation works. Effort: 2h. Risk: Low.
-- [ ] 7.2 Create `src/renderer/components/industrial/IndustrialCard.vue` with mono-font header separated by 1px rule. Acceptance: Header in uppercase monospace, background lighter than page. Effort: 1.5h. Risk: Low.
-- [ ] 7.3 Create `src/renderer/components/industrial/HazardButton.vue` with diagonal striped hover (yellow/black, 45°, 8px stripes). Acceptance: Default red bg, hover shows stripes, disabled at 0.5 opacity. Effort: 2h. Risk: Medium (cross-platform gradient).
-- [ ] 7.4 Write unit tests for StatusLamp, IndustrialCard, HazardButton. Acceptance: Mount with props, assert rendered classes/styles. Effort: 3h. Risk: Low.
+- [x] 7.1 Create `src/renderer/components/industrial/StatusLamp.vue` with props: color, size (sm/md/lg), label, pulse. Acceptance: Renders glowing circle with box-shadow, pulse animation works. Effort: 2h. Risk: Low.
+- [x] 7.2 Create `src/renderer/components/industrial/IndustrialCard.vue` with mono-font header separated by 1px rule. Acceptance: Header in uppercase monospace, background lighter than page. Effort: 1.5h. Risk: Low.
+- [x] 7.3 Create `src/renderer/components/industrial/HazardButton.vue` with diagonal striped hover (yellow/black, 45°, 8px stripes). Acceptance: Default red bg, hover shows stripes, disabled at 0.5 opacity. Effort: 2h. Risk: Medium (cross-platform gradient).
+- [x] 7.4 Write unit tests for StatusLamp, IndustrialCard, HazardButton. Acceptance: Mount with props, assert rendered classes/styles. Effort: 3h. Risk: Low.
 
 **Phase 7 total: ~8.5h**
 
 ## Phase 8: Work Order Views (Depends on Phase 3, Phase 7 for StatusLamp)
 
-- [ ] 8.1 Modify `src/renderer/views/work-orders/WorkOrderList.vue`: replace `#fff`, add StatusLamp for payment status (pending=yellow, partial=primary, paid=emerald). Acceptance: Zero hex colors, payment lamps render. Effort: 2.5h. Risk: Medium.
-- [ ] 8.2 Modify `src/renderer/views/work-orders/WorkOrderForm.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
-- [ ] 8.3 Modify `src/renderer/views/work-orders/PaymentSection.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
-- [ ] 8.4 Modify `src/renderer/components/LineItemsEditor.vue`: replace `#f9f9f9` row bg with `--bi-surface-container`, mono font for numeric columns. Acceptance: Zero hex colors, numeric data in monospace. Effort: 2h. Risk: Low.
+- [x] 8.1 Modify `src/renderer/views/work-orders/WorkOrderList.vue`: replace `#fff`, add StatusLamp for payment status (pending=yellow, partial=primary, paid=emerald). Acceptance: Zero hex colors, payment lamps render. Effort: 2.5h. Risk: Medium.
+- [x] 8.2 Modify `src/renderer/views/work-orders/WorkOrderForm.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
+- [x] 8.3 Modify `src/renderer/views/work-orders/PaymentSection.vue`: replace hardcoded colors with tokens. Acceptance: Zero hex colors. Effort: 1.5h. Risk: Low.
+- [x] 8.4 Modify `src/renderer/components/LineItemsEditor.vue`: replace `#f9f9f9` row bg with `--bi-surface-container`, mono font for numeric columns. Acceptance: Zero hex colors, numeric data in monospace. Effort: 2h. Risk: Low.
 
 **Phase 8 total: ~7.5h**
 
 ## Phase 9: Settings View (Depends on Phase 3)
 
-- [ ] 9.1 Modify `src/renderer/views/settings/SettingsView.vue`: replace hardcoded colors with tokens, ensure save button meets 52px touch target. Acceptance: Zero hex colors, save button uses `--bi-primary-container`. Effort: 1.5h. Risk: Low.
+- [x] 9.1 Modify `src/renderer/views/settings/SettingsView.vue`: replace hardcoded colors with tokens, ensure save button meets 52px touch target. Acceptance: Zero hex colors, save button uses `--bi-primary-container`. Effort: 1.5h. Risk: Low.
 
 **Phase 9 total: ~1.5h**
 
 ## Phase 10: Integration & Polish (Depends on all above)
 
-- [ ] 10.1 Replace generic components with IndustrialCard in VehicleList where appropriate. Acceptance: Vehicles wrapped in IndustrialCard. Effort: 1h. Risk: Low.
-- [ ] 10.2 Replace delete actions with HazardButton in CustomerForm, VehicleForm, QuoteForm. Acceptance: Delete buttons show striped hover. Effort: 1.5h. Risk: Low.
+- [x] 10.1 Replace generic components with IndustrialCard in VehicleList where appropriate. Acceptance: Vehicles wrapped in IndustrialCard. Effort: 1h. Risk: Low.
+- [x] 10.2 Replace delete actions with HazardButton in CustomerForm, VehicleForm, QuoteForm. Acceptance: Delete buttons show striped hover. Effort: 1.5h. Risk: Low.
 - [ ] 10.3 Hardcoded color audit: `grep -rE '#[0-9a-fA-F]{3,8}' src/renderer/views/ src/renderer/layouts/` returns zero matches (excluding comments). Acceptance: Zero hardcoded colors. Effort: 1h. Risk: Low.
 - [ ] 10.4 Visual consistency audit: verify all views use tokens, check contrast ratios. Acceptance: All text ≥ 4.5:1 contrast. Effort: 2h. Risk: Low.
 - [ ] 10.5 Update documentation: add theme system docs, component usage examples. Acceptance: Docs explain token system and custom components. Effort: 2h. Risk: Low.
