@@ -157,11 +157,12 @@ function renderActions(row: Vehicle) {
   ])
 }
 
-const columns = computed<DataTableColumns<Vehicle>>(() => [
+  const columns = computed<DataTableColumns<Vehicle>>(() => [
   {
     title: t('vehicle.licensePlate'),
     key: 'license_plate',
-    sorter: (a, b) => a.license_plate.localeCompare(b.license_plate)
+    sorter: (a, b) => a.license_plate.localeCompare(b.license_plate),
+    render: (row) => h('span', { class: 'mono-text' }, row.license_plate)
   },
   {
     title: t('vehicle.make'),
@@ -200,7 +201,7 @@ const columns = computed<DataTableColumns<Vehicle>>(() => [
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .page-header h1 {
@@ -210,8 +211,8 @@ const columns = computed<DataTableColumns<Vehicle>>(() => [
 
 .filters {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-2);
 }
 
 .search-input {
@@ -225,11 +226,15 @@ const columns = computed<DataTableColumns<Vehicle>>(() => [
 }
 
 .vehicle-table {
-  background-color: #fff;
+  background-color: var(--bi-surface-container);
+}
+
+.mono-text {
+  font: var(--bi-data-mono);
 }
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 </style>

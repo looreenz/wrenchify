@@ -23,12 +23,12 @@
 
         <div class="form-row">
           <n-form-item :label="$t('vehicle.licensePlate')" path="license_plate">
-            <n-input
-              v-model:value="formValue.license_plate"
-              :disabled="isReadOnly"
-              :placeholder="$t('vehicle.licensePlate')"
-              :input-props="{ 'data-testid': 'vehicle-license-plate' }"
-            />
+          <n-input
+            v-model:value="formValue.license_plate"
+            :disabled="isReadOnly"
+            :placeholder="$t('vehicle.licensePlate')"
+            :input-props="{ 'data-testid': 'vehicle-license-plate', class: 'mono-input' }"
+          />
           </n-form-item>
           <n-form-item :label="$t('vehicle.year')" path="year">
             <n-input-number
@@ -68,6 +68,7 @@
             :disabled="isReadOnly"
             :placeholder="$t('vehicle.vin')"
             :maxlength="17"
+            :input-props="{ class: 'mono-input' }"
           />
         </n-form-item>
 
@@ -273,7 +274,7 @@ function makePayload(): VehicleCreate {
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: var(--bi-space-3);
 }
 
 .page-header h1 {
@@ -282,24 +283,28 @@ function makePayload(): VehicleCreate {
 }
 
 .form {
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 8px;
+  background-color: var(--bi-surface-container-low);
+  padding: var(--bi-space-3);
+  border-radius: var(--bi-radius-lg);
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--bi-space-2);
 }
 
 .year-input {
   width: 100%;
 }
 
+.mono-input {
+  font: var(--bi-data-mono);
+}
+
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--bi-space-2);
+  margin-top: var(--bi-space-3);
 }
 </style>
