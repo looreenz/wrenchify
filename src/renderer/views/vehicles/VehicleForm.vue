@@ -27,6 +27,7 @@
               v-model:value="formValue.license_plate"
               :disabled="isReadOnly"
               :placeholder="$t('vehicle.licensePlate')"
+              :input-props="{ 'data-testid': 'vehicle-license-plate' }"
             />
           </n-form-item>
           <n-form-item :label="$t('vehicle.year')" path="year">
@@ -48,6 +49,7 @@
               v-model:value="formValue.make"
               :disabled="isReadOnly"
               :placeholder="$t('vehicle.make')"
+              :input-props="{ 'data-testid': 'vehicle-make' }"
             />
           </n-form-item>
           <n-form-item :label="$t('vehicle.model')" path="model">
@@ -55,6 +57,7 @@
               v-model:value="formValue.model"
               :disabled="isReadOnly"
               :placeholder="$t('vehicle.model')"
+              :input-props="{ 'data-testid': 'vehicle-model' }"
             />
           </n-form-item>
         </div>

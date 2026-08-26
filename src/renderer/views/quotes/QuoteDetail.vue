@@ -57,13 +57,13 @@
         </div>
 
         <div class="detail-actions">
-          <n-button v-if="quote.status === 'draft'" type="success" @click="handleAccept">
+          <n-button v-if="quote.status === 'draft'" type="success" data-testid="quote-accept" @click="handleAccept">
             {{ $t('quote.statusAccepted') }}
           </n-button>
           <n-button v-if="quote.status === 'draft'" type="error" @click="handleReject">
             {{ $t('quote.statusRejected') }}
           </n-button>
-          <n-button v-if="quote.status === 'accepted'" type="primary" @click="handleConvert">
+          <n-button v-if="quote.status === 'accepted'" type="primary" data-testid="quote-convert" @click="handleConvert">
             {{ $t('quote.convert') }}
           </n-button>
           <n-button v-if="quote.status === 'draft'" @click="handleEdit">

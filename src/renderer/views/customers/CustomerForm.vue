@@ -18,6 +18,7 @@
               v-model:value="formValue.first_name"
               :disabled="isReadOnly"
               :placeholder="$t('customer.firstName')"
+              :input-props="{ 'data-testid': 'customer-first-name' }"
             />
           </n-form-item>
           <n-form-item :label="$t('customer.lastName')" path="last_name">
@@ -25,6 +26,7 @@
               v-model:value="formValue.last_name"
               :disabled="isReadOnly"
               :placeholder="$t('customer.lastName')"
+              :input-props="{ 'data-testid': 'customer-last-name' }"
             />
           </n-form-item>
         </div>

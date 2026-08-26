@@ -271,13 +271,22 @@ const rules: FormRules = {
 }
 
 onMounted(async () => {
-  void customerStore.load()
-  void vehicleStore.load()
+  await customerStore.load()
+  await vehicleStore.load()
   void settingsStore.load()
 
   const quoteIdParam = route.query.quoteId
+  const customerIdParam = route.query.customerId
+  const vehicleIdParam = route.query.vehicleId
+
   if (quoteIdParam && !isEdit.value) {
     formValue.quote_id = Number(quoteIdParam)
+  } else if (!isEdit.value && customerIdParam) {
+    formValue.customer_id = Number(customerIdParam)
+    handleCustomerChange()
+    if (vehicleIdParam) {
+      formValue.vehicle_id = Number(vehicleIdParam)
+    }
   }
 
   if (isEdit.value) {

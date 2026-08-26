@@ -2,7 +2,7 @@
   <div class="payment-section">
     <div class="section-header">
       <h3>{{ $t('payment.title') }}</h3>
-      <n-button v-if="!isLocked" type="primary" size="small" @click="handleAdd">
+      <n-button v-if="!isLocked" type="primary" size="small" data-testid="payment-add" @click="handleAdd">
         {{ $t('payment.add') }}
       </n-button>
     </div>
@@ -96,6 +96,7 @@
         :min="0.01"
         :precision="2"
         class="edit-field"
+        :input-props="{ 'data-testid': 'payment-amount' }"
       />
       <n-input
         v-model:value="newForm.notes"
@@ -103,7 +104,7 @@
         class="edit-field"
       />
       <div class="edit-actions">
-        <n-button size="small" type="primary" @click="handleCreate">
+        <n-button size="small" type="primary" data-testid="payment-save" @click="handleCreate">
           {{ $t('app.save') }}
         </n-button>
         <n-button size="small" @click="cancelAdd">

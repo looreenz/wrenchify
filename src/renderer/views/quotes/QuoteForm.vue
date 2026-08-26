@@ -65,6 +65,7 @@
               :min="0"
               :precision="2"
               class="number-input"
+              :input-props="{ 'data-testid': 'quote-labor-hours' }"
             />
           </n-form-item>
           <n-form-item :label="$t('quote.hourlyRate')" path="hourly_rate">
@@ -74,6 +75,7 @@
               :min="0"
               :precision="2"
               class="number-input"
+              :input-props="{ 'data-testid': 'quote-hourly-rate' }"
             />
           </n-form-item>
           <n-form-item :label="$t('quote.partsCost')" path="parts_cost">
@@ -83,6 +85,7 @@
               :min="0"
               :precision="2"
               class="number-input"
+              :input-props="{ 'data-testid': 'quote-parts-cost' }"
             />
           </n-form-item>
         </div>
@@ -215,9 +218,19 @@ const rules: FormRules = {
 }
 
 onMounted(async () => {
-  void customerStore.load()
-  void vehicleStore.load()
+  await customerStore.load()
+  await vehicleStore.load()
   void settingsStore.load()
+
+  const customerIdParam = route.query.customerId
+  const vehicleIdParam = route.query.vehicleId
+  if (!isEdit.value && customerIdParam) {
+    formValue.customer_id = Number(customerIdParam)
+    handleCustomerChange()
+    if (vehicleIdParam) {
+      formValue.vehicle_id = Number(vehicleIdParam)
+    }
+  }
 
   if (quoteId.value !== null) {
     loading.value = true
