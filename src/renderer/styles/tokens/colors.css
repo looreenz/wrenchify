@@ -1,0 +1,91 @@
+:root {
+  /* Surface */
+  --bi-surface: #0b1326;
+  --bi-surface-dim: #0b1326;
+  --bi-surface-bright: #31394d;
+  --bi-surface-container-lowest: #060e20;
+  --bi-surface-container-low: #131b2e;
+  --bi-surface-container: #171f33;
+  --bi-surface-container-high: #222a3d;
+  --bi-surface-container-highest: #2d3449;
+
+  /* On-surface */
+  --bi-on-surface: #dae2fd;
+  --bi-on-surface-variant: #e2bfb0;
+  --bi-inverse-surface: #dae2fd;
+  --bi-inverse-on-surface: #283044;
+
+  /* Outlines */
+  --bi-outline: #a98a7d;
+  --bi-outline-variant: #5a4136;
+  --bi-surface-tint: #ffb693;
+
+  /* Primary (Beta Orange) */
+  --bi-primary: #ffb693;
+  --bi-on-primary: #561f00;
+  --bi-primary-container: #ff6b00;
+  --bi-on-primary-container: #572000;
+  --bi-inverse-primary: #a04100;
+
+  /* Secondary (Slate Blue) */
+  --bi-secondary: #b9c7e0;
+  --bi-on-secondary: #233144;
+  --bi-secondary-container: #3c4a5e;
+  --bi-on-secondary-container: #abb9d2;
+
+  /* Tertiary (Cool Gray) */
+  --bi-tertiary: #c3c7cb;
+  --bi-on-tertiary: #2c3134;
+  --bi-tertiary-container: #959a9e;
+  --bi-on-tertiary-container: #2d3235;
+
+  /* Error */
+  --bi-error: #ffb4ab;
+  --bi-on-error: #690005;
+  --bi-error-container: #93000a;
+  --bi-on-error-container: #ffdad6;
+
+  /* Primary fixed */
+  --bi-primary-fixed: #ffdbcc;
+  --bi-primary-fixed-dim: #ffb693;
+  --bi-on-primary-fixed: #351000;
+  --bi-on-primary-fixed-variant: #7a3000;
+
+  /* Secondary fixed */
+  --bi-secondary-fixed: #d5e3fd;
+  --bi-secondary-fixed-dim: #b9c7e0;
+  --bi-on-secondary-fixed: #0d1c2f;
+  --bi-on-secondary-fixed-variant: #3a485c;
+
+  /* Tertiary fixed */
+  --bi-tertiary-fixed: #dfe3e7;
+  --bi-tertiary-fixed-dim: #c3c7cb;
+  --bi-on-tertiary-fixed: #171c1f;
+  --bi-on-tertiary-fixed-variant: #43474b;
+
+  /* Legacy aliases */
+  --bi-background: #0b1326;
+  --bi-on-background: #dae2fd;
+  --bi-surface-variant: #2d3449;
+
+  /* Brand accents */
+  --bi-beta-orange: #ff6b00;
+  --bi-charcoal-black: #0f172a;
+  --bi-slate-gray: #334155;
+  --bi-hazard-yellow: #fde047;
+
+  /* Semantic colors */
+  --bi-success: #4ade80;
+  --bi-on-success: #000000;
+  --bi-warning: #fde047;
+  --bi-on-warning: #000000;
+
+  /* Alpha variants */
+  --bi-primary-container-alpha-9: rgba(255, 107, 0, 0.09);
+  --bi-primary-container-alpha-20: rgba(255, 107, 0, 0.2);
+
+  /* Semantic aliases */
+  --bi-bg: var(--bi-surface);
+  --bi-text: var(--bi-on-surface);
+  --bi-border: var(--bi-outline);
+}

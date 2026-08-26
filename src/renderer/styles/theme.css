@@ -1,0 +1,5 @@
+/* Beta Industrial design token barrel */
+@import './tokens/colors.css';
+@import './tokens/typography.css';
+@import './tokens/spacing.css';
+@import './tokens/borders.css';
