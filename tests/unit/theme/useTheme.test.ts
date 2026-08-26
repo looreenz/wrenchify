@@ -13,11 +13,11 @@ describe('useTheme', () => {
     const { themeOverrides } = useTheme()
 
     expect(themeOverrides.common).toBeDefined()
-    expect(themeOverrides.common?.primaryColor).toBe('var(--bi-primary-container)')
-    expect(themeOverrides.common?.bodyColor).toBe('var(--bi-surface)')
-    expect(themeOverrides.common?.cardColor).toBe('var(--bi-surface-container)')
-    expect(themeOverrides.common?.fontFamily).toBe('var(--bi-font-sans)')
-    expect(themeOverrides.common?.heightMedium).toBe('var(--bi-touch-target)')
+    expect(themeOverrides.common?.primaryColor).toBe('#ff6b00')
+    expect(themeOverrides.common?.bodyColor).toBe('#0b1326')
+    expect(themeOverrides.common?.cardColor).toBe('#171f33')
+    expect(themeOverrides.common?.fontFamily).toBe("system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif")
+    expect(themeOverrides.common?.heightMedium).toBe('52px')
   })
 
   it('returns component-specific overrides for Button, DataTable, Input and Menu', () => {
@@ -29,8 +29,8 @@ describe('useTheme', () => {
     expect(themeOverrides.Menu).toBeDefined()
 
     expect(themeOverrides.Button?.fontWeightStrong).toBe('700')
-    expect(themeOverrides.DataTable?.thColor).toBe('var(--bi-surface-container-high)')
-    expect(themeOverrides.Input?.borderFocus).toBe('var(--bi-primary-container)')
-    expect(themeOverrides.Menu?.itemTextColorActive).toBe('var(--bi-primary-container)')
+    expect(themeOverrides.DataTable?.thColor).toBe('#222a3d')
+    expect(themeOverrides.Input?.borderFocus).toBe('#ff6b00')
+    expect(themeOverrides.Menu?.itemTextColorActive).toBe('#ff6b00')
   })
 })

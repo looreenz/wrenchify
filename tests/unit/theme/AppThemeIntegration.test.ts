@@ -28,8 +28,8 @@ describe('App theme integration', () => {
     expect(provider.props('theme')).toBe(darkTheme)
 
     const overrides = provider.props('themeOverrides')
-    expect(overrides.common.primaryColor).toBe('var(--bi-primary-container)')
-    expect(overrides.common.bodyColor).toBe('var(--bi-surface)')
-    expect(overrides.Input.borderFocus).toBe('var(--bi-primary-container)')
+    expect(overrides.common.primaryColor).toBe('#ff6b00')
+    expect(overrides.common.bodyColor).toBe('#0b1326')
+    expect(overrides.Input.borderFocus).toBe('#ff6b00')
   })
 })
