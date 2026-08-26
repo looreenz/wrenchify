@@ -1,0 +1,52 @@
+{
+  "name": "wrenchify",
+  "version": "0.1.0",
+  "description": "Bilingual desktop app for auto repair shop management",
+  "main": "./out/main/index.js",
+  "author": "Lorenzo",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "electron-vite build && electron-builder",
+    "dist:mac": "electron-vite build && electron-builder --mac",
+    "dist:win": "electron-vite build && electron-builder --win",
+    "dist:linux": "electron-vite build && electron-builder --linux",
+    "typecheck": "tsc --noEmit",
+    "pretest": "pnpm rebuild better-sqlite3",
+    "test": "vitest run",
+    "posttest": "pnpm exec electron-rebuild -f -w better-sqlite3",
+    "pretest:unit": "pnpm rebuild better-sqlite3",
+    "test:unit": "vitest run",
+    "posttest:unit": "pnpm exec electron-rebuild -f -w better-sqlite3",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.0.0",
+    "electron-updater": "^6.3.0",
+    "lucide-vue-next": "^1.0.0",
+    "naive-ui": "^2.45.2",
+    "pinia": "^4.0.3",
+    "vue": "^3.5.0",
+    "vue-i18n": "^10.0.0",
+    "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.2.0",
+    "@playwright/test": "^1.62.1",
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/node": "^22.0.0",
+    "@vitejs/plugin-vue": "^5.1.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.0",
+    "electron-vite": "^2.3.0",
+    "node-gyp": "^13.0.1",
+    "typescript": "^5.6.0",
+    "vite": "^5.4.0",
+    "vitest": "^3.2.7",
+    "vue-tsc": "^2.1.0"
+  }
+}

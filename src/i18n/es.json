@@ -1,0 +1,200 @@
+{
+  "app": {
+    "title": "Wrenchify",
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "new": "Nuevo",
+    "search": "Buscar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "actions": "Acciones",
+    "empty": "Sin resultados",
+    "error": "Se produjo un error",
+    "success": "Operación completada",
+    "required": "Campo obligatorio",
+    "invalidEmail": "Dirección de correo no válida",
+    "invalidYear": "Año no válido",
+    "noResults": "No se encontraron resultados",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar este elemento?",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "nav": {
+    "customers": "Clientes",
+    "vehicles": "Vehículos",
+    "quotes": "Presupuestos",
+    "workOrders": "Órdenes de trabajo",
+    "settings": "Configuración"
+  },
+  "customer": {
+    "title": "Clientes",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "phone": "Teléfono",
+    "email": "Email",
+    "address": "Dirección",
+    "fiscalCode": "Código fiscal",
+    "notes": "Notas",
+    "preferredLanguage": "Idioma preferido",
+    "vehicleCount": "Vehículos",
+    "new": "Nuevo cliente",
+    "edit": "Editar cliente",
+    "detail": "Detalle del cliente",
+    "searchPlaceholder": "Buscar por nombre o apellido...",
+    "validation": {
+      "lastNameRequired": "El apellido es obligatorio",
+      "emailInvalid": "La dirección de correo no es válida"
+    },
+    "messages": {
+      "created": "Cliente creado",
+      "updated": "Cliente actualizado",
+      "deleted": "Cliente eliminado",
+      "deleteConfirm": "¿Eliminar el cliente? También se eliminarán {count} vehículos asociados."
+    }
+  },
+  "vehicle": {
+    "title": "Vehículos",
+    "licensePlate": "Matrícula",
+    "make": "Marca",
+    "model": "Modelo",
+    "year": "Año",
+    "vin": "VIN",
+    "notes": "Notas",
+    "customer": "Cliente",
+    "new": "Nuevo vehículo",
+    "edit": "Editar vehículo",
+    "detail": "Detalle del vehículo",
+    "timeline": "Historial de intervenciones",
+    "filterByCustomer": "Filtrar por cliente",
+    "allCustomers": "Todos los clientes",
+    "searchPlaceholder": "Buscar por matrícula, marca o modelo...",
+    "validation": {
+      "customerRequired": "El cliente es obligatorio",
+      "modelRequired": "El modelo es obligatorio",
+      "licensePlateRequired": "La matrícula es obligatoria",
+      "yearRange": "El año debe estar entre 1900 y el año actual",
+      "vinLength": "El VIN no puede tener más de 17 caracteres"
+    },
+    "messages": {
+      "created": "Vehículo creado",
+      "updated": "Vehículo actualizado",
+      "deleted": "Vehículo eliminado",
+      "deleteConfirm": "¿Eliminar el vehículo? Las órdenes de trabajo asociadas impedirán la eliminación."
+    }
+  },
+  "quote": {
+    "title": "Presupuestos",
+    "quoteNumber": "Número de presupuesto",
+    "date": "Fecha",
+    "status": "Estado",
+    "description": "Descripción",
+    "laborHours": "Horas de trabajo",
+    "hourlyRate": "Tarifa por hora",
+    "partsCost": "Costo de repuestos",
+    "totalCost": "Costo total",
+    "notes": "Notas",
+    "vehicle": "Vehículo",
+    "customer": "Cliente",
+    "new": "Nuevo presupuesto",
+    "edit": "Editar presupuesto",
+    "detail": "Detalle del presupuesto",
+    "convert": "Convertir en orden",
+    "statusDraft": "Borrador",
+    "statusAccepted": "Aceptado",
+    "statusRejected": "Rechazado",
+    "statusConverted": "Convertido",
+    "validation": {
+      "vehicleRequired": "El vehículo es obligatorio"
+    }
+  },
+  "workOrder": {
+    "title": "Órdenes de trabajo",
+    "orderNumber": "Número de orden",
+    "dateIn": "Fecha de entrada",
+    "dateOut": "Fecha de salida",
+    "mileageIn": "Km de entrada",
+    "mileageOut": "Km de salida",
+    "description": "Descripción",
+    "laborHours": "Horas de trabajo",
+    "hourlyRate": "Tarifa por hora",
+    "partsCost": "Costo de repuestos",
+    "totalCost": "Costo total",
+    "paymentStatus": "Estado de pago",
+    "notes": "Notas",
+    "vehicle": "Vehículo",
+    "customer": "Cliente",
+    "quote": "Presupuesto",
+    "lineItems": "Líneas de trabajo",
+    "new": "Nueva orden",
+    "edit": "Editar orden",
+    "detail": "Detalle de la orden",
+    "paymentPending": "Pendiente",
+    "paymentPartial": "Parcial",
+    "paymentPaid": "Pagado",
+    "filterDateFrom": "Desde",
+    "filterDateTo": "Hasta",
+    "filterPaymentStatus": "Estado de pago",
+    "allStatuses": "Todos los estados",
+    "validation": {
+      "vehicleRequired": "El vehículo es obligatorio",
+      "mileageOutGreater": "Los km de salida deben ser mayores o iguales a los de entrada"
+    }
+  },
+  "lineItem": {
+    "description": "Descripción",
+    "quantity": "Cantidad",
+    "unitPrice": "Precio unitario",
+    "type": "Tipo",
+    "typeParts": "Repuestos",
+    "typeLabor": "Mano de obra"
+  },
+  "payment": {
+    "title": "Pagos",
+    "amount": "Importe",
+    "method": "Método",
+    "date": "Fecha de pago",
+    "notes": "Notas",
+    "methodCash": "Efectivo",
+    "methodCard": "Tarjeta",
+    "methodTransfer": "Transferencia",
+    "runningTotal": "Total pagado",
+    "remainingBalance": "Saldo restante",
+    "add": "Agregar pago",
+    "edit": "Editar pago",
+    "validation": {
+      "amountRequired": "El importe es obligatorio",
+      "amountPositive": "El importe debe ser mayor que cero"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "shopName": "Nombre del taller",
+    "hourlyRate": "Tarifa por hora predeterminada",
+    "defaultLanguage": "Idioma predeterminado",
+    "currency": "Moneda",
+    "languageIt": "Italiano",
+    "languageEs": "Español",
+    "exportBackup": "Exportar backup",
+    "restoreBackup": "Restaurar backup",
+    "exportSuccess": "Backup exportado a {path}",
+    "restoreSuccess": "Backup restaurado. La aplicación se reiniciará.",
+    "validation": {
+      "hourlyRatePositive": "La tarifa por hora debe ser mayor o igual a cero"
+    }
+  },
+  "common": {
+    "close": "Cerrar",
+    "open": "Abrir",
+    "view": "Ver",
+    "saveChanges": "Guardar cambios",
+    "discard": "Descartar",
+    "filters": "Filtros",
+    "clear": "Limpiar",
+    "apply": "Aplicar",
+    "loading": "Cargando..."
+  }
+}
