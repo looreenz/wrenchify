@@ -59,8 +59,8 @@ import {
   Settings
 } from 'lucide-vue-next'
 import type { MenuOption } from 'naive-ui'
-import logotipoImg from '../assets/wrenchify-light-theme-transparent.png'
-import isotipoImg from '../assets/logo-light-theme-transparent.png'
+import logotipoImg from '../assets/wrenchify-dark-theme-transparent.png'
+import isotipoImg from '../assets/logo-dark-theme-transparent.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -122,13 +122,17 @@ const menuOptions = computed<MenuOption[]>(() => [
   min-height: 100vh;
 }
 
+.main-layout :deep(.n-layout-sider) {
+  background-color: var(--bi-surface-container);
+}
+
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 80px;
-  padding: 0 16px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0 var(--bi-space-2);
+  border-bottom: var(--bi-border-thin);
 }
 
 .sidebar-logo {
@@ -144,7 +148,8 @@ const menuOptions = computed<MenuOption[]>(() => [
 }
 
 .main-content {
-  padding: 24px;
+  padding: var(--bi-space-3);
   min-height: 100vh;
+  background-color: var(--bi-bg);
 }
 </style>
