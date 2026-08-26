@@ -48,14 +48,14 @@ Chain strategy: stacked-to-main
 
 ## Phase 3: Layout Migration (Depends on Phase 2)
 
-- [ ] 3.1 Modify `src/renderer/layouts/MainLayout.vue`: replace all hardcoded colors with `var(--bi-*)`, swap logo to dark-theme variant. Acceptance: Zero hex colors in file, sidebar uses `--bi-surface-container`. Effort: 2h. Risk: Low.
+- [x] 3.1 Modify `src/renderer/layouts/MainLayout.vue`: replace all hardcoded colors with `var(--bi-*)`, swap logo to dark-theme variant. Acceptance: Zero hex colors in file, sidebar uses `--bi-surface-container`. Effort: 2h. Risk: Low.
 
 **Phase 3 total: ~2h**
 
 ## Phase 4: Customer Views (Depends on Phase 3)
 
-- [ ] 4.1 Modify `src/renderer/views/customers/CustomerList.vue`: replace `#fff` table bg, hardcoded spacing with tokens. Acceptance: Zero hex colors, table uses `--bi-surface-container`. Effort: 1.5h. Risk: Low.
-- [ ] 4.2 Modify `src/renderer/views/customers/CustomerForm.vue`: replace `#fff` form bg, `8px` radius with tokens. Acceptance: Zero hex colors, inputs use `--bi-surface-container-low`. Effort: 1.5h. Risk: Low.
+- [x] 4.1 Modify `src/renderer/views/customers/CustomerList.vue`: replace `#fff` table bg, hardcoded spacing with tokens. Acceptance: Zero hex colors, table uses `--bi-surface-container`. Effort: 1.5h. Risk: Low.
+- [x] 4.2 Modify `src/renderer/views/customers/CustomerForm.vue`: replace `#fff` form bg, `8px` radius with tokens. Acceptance: Zero hex colors, inputs use `--bi-surface-container-low`. Effort: 1.5h. Risk: Low.
 
 **Phase 4 total: ~3h**
 
