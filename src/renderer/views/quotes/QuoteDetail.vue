@@ -207,7 +207,7 @@ function statusType(status: QuoteStatus): 'default' | 'success' | 'error' | 'war
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: var(--bi-space-3);
 }
 
 .page-header h1 {
@@ -219,12 +219,12 @@ function statusType(status: QuoteStatus): 'default' | 'success' | 'error' | 'war
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--bi-outline);
 }
 
 .detail-label {
   font-weight: 500;
-  color: #666;
+  color: var(--bi-on-surface-variant);
 }
 
 .detail-value {
@@ -235,13 +235,13 @@ function statusType(status: QuoteStatus): 'default' | 'success' | 'error' | 'war
 
 .total-row {
   font-size: 1.1rem;
-  color: #18a058;
+  color: var(--bi-success);
   font-weight: 600;
 }
 
 .detail-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--bi-space-2);
+  margin-top: var(--bi-space-3);
 }
 </style>

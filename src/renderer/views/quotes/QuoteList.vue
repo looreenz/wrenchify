@@ -49,8 +49,7 @@ import {
   NButton,
   NDataTable,
   NInput,
-  NSelect,
-  NTag
+  NSelect
 } from 'naive-ui'
 import { Pencil, Trash2, Eye } from 'lucide-vue-next'
 import { useQuoteStore } from '../../stores/quotes'
@@ -144,18 +143,6 @@ async function handleDelete(row: Quote): Promise<void> {
   }
 }
 
-function statusType(status: QuoteStatus): 'default' | 'success' | 'error' | 'warning' {
-  switch (status) {
-    case 'accepted':
-    case 'converted':
-      return 'success'
-    case 'rejected':
-      return 'error'
-    default:
-      return 'default'
-  }
-}
-
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('it-IT', {
     style: 'currency',
@@ -164,11 +151,11 @@ function formatCurrency(value: number): string {
 }
 
 function renderStatus(row: Quote) {
-  return h(
-    NTag,
-    { type: statusType(row.status), size: 'small' },
-    { default: () => t(`quote.status${row.status.charAt(0).toUpperCase()}${row.status.slice(1)}`) }
-  )
+  const label = t(`quote.status${row.status.charAt(0).toUpperCase()}${row.status.slice(1)}`)
+  return h('span', { class: `status-lamp status-${row.status}` }, [
+    h('span', { class: 'status-lamp-indicator' }),
+    h('span', { class: 'status-lamp-label' }, label)
+  ])
 }
 
 function renderActions(row: Quote) {
@@ -255,7 +242,7 @@ const columns = computed<DataTableColumns<Quote>>(() => [
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .page-header h1 {
@@ -265,8 +252,8 @@ const columns = computed<DataTableColumns<Quote>>(() => [
 
 .filters {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-2);
   flex-wrap: wrap;
 }
 
@@ -282,11 +269,45 @@ const columns = computed<DataTableColumns<Quote>>(() => [
 }
 
 .quote-table {
-  background-color: #fff;
+  background-color: var(--bi-surface-container);
+}
+
+.status-lamp {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--bi-space-1);
+}
+
+.status-lamp-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--bi-tertiary-container);
+  box-shadow: 0 0 8px var(--bi-tertiary-container);
+}
+
+.status-draft .status-lamp-indicator {
+  background-color: var(--bi-tertiary-container);
+  box-shadow: 0 0 8px var(--bi-tertiary-container);
+}
+
+.status-accepted .status-lamp-indicator {
+  background-color: var(--bi-success);
+  box-shadow: 0 0 8px var(--bi-success);
+}
+
+.status-rejected .status-lamp-indicator {
+  background-color: var(--bi-error);
+  box-shadow: 0 0 8px var(--bi-error);
+}
+
+.status-converted .status-lamp-indicator {
+  background-color: var(--bi-primary-container);
+  box-shadow: 0 0 8px var(--bi-primary-container);
 }
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 </style>
