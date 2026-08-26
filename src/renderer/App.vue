@@ -1,17 +1,23 @@
 <template>
-  <router-view />
+  <n-config-provider :theme="theme" :theme-overrides="themeOverrides">
+    <router-view />
+  </n-config-provider>
 </template>
 
 <script setup lang="ts">
-// Root component. Router renders MainLayout and its nested views.
+import { NConfigProvider } from 'naive-ui'
+import { useTheme } from './composables/useTheme'
+import './styles/theme.css'
+
+const { theme, themeOverrides } = useTheme()
 </script>
 
 <style>
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f5f5f5;
-  color: #1a1a1a;
+  font-family: var(--bi-font-sans);
+  background-color: var(--bi-bg);
+  color: var(--bi-text);
 }
 
 * {
