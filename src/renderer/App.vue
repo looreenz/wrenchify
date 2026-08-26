@@ -1,12 +1,9 @@
 <template>
-  <div class="app-shell">
-    <h1>{{ $t('app.title') }}</h1>
-    <p>{{ $t('app.loading') }}</p>
-  </div>
+  <router-view />
 </template>
 
 <script setup lang="ts">
-// Root component placeholder. Router and layout will be wired in Batch 3.
+// Root component. Router renders MainLayout and its nested views.
 </script>
 
 <style>
@@ -17,11 +14,7 @@ body {
   color: #1a1a1a;
 }
 
-.app-shell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+* {
+  box-sizing: border-box;
 }
 </style>
