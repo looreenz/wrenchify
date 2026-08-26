@@ -1,11 +1,10 @@
 <template>
-  <div class="payment-section">
-    <div class="section-header">
-      <h3>{{ $t('payment.title') }}</h3>
+  <IndustrialCard :title="$t('payment.title')">
+    <template #header-actions>
       <n-button v-if="!isLocked" type="primary" size="small" data-testid="payment-add" @click="handleAdd">
         {{ $t('payment.add') }}
       </n-button>
-    </div>
+    </template>
 
     <div class="balance-summary">
       <div class="balance-item">
@@ -112,7 +111,7 @@
         </n-button>
       </div>
     </div>
-  </div>
+  </IndustrialCard>
 </template>
 
 <script setup lang="ts">
@@ -128,6 +127,7 @@ import {
   NTag
 } from 'naive-ui'
 import { usePaymentStore } from '../../stores/payments'
+import IndustrialCard from '../../components/industrial/IndustrialCard.vue'
 import type { Payment, PaymentCreate, PaymentMethod, PaymentUpdate, WorkOrderPaymentStatus } from '../../../shared/types'
 
 const props = defineProps<{
@@ -280,32 +280,14 @@ async function handleDelete(payment: Payment): Promise<void> {
 </script>
 
 <style scoped>
-.payment-section {
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 8px;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.section-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
 .balance-summary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-  padding: 16px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-3);
+  padding: var(--bi-space-2);
+  background-color: var(--bi-surface-container);
+  border-radius: var(--bi-radius-md);
 }
 
 .balance-item {
@@ -315,23 +297,24 @@ async function handleDelete(payment: Payment): Promise<void> {
 
 .balance-label {
   font-size: 0.875rem;
-  color: #666;
+  color: var(--bi-on-surface-variant);
 }
 
 .balance-value {
   font-size: 1.1rem;
   font-weight: 600;
+  color: var(--bi-on-surface);
 }
 
 .balance-negative {
-  color: #d03050;
+  color: var(--bi-error);
 }
 
 .payment-row {
-  margin-bottom: 12px;
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
+  margin-bottom: var(--bi-space-2);
+  padding: var(--bi-space-2);
+  background-color: var(--bi-surface-container);
+  border-radius: var(--bi-radius-md);
 }
 
 .payment-display {
@@ -343,32 +326,34 @@ async function handleDelete(payment: Payment): Promise<void> {
 .payment-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--bi-space-2);
   flex-wrap: wrap;
 }
 
 .payment-date {
   font-weight: 500;
+  color: var(--bi-on-surface);
 }
 
 .payment-amount {
   font-weight: 600;
+  color: var(--bi-on-surface);
 }
 
 .payment-notes {
-  color: #666;
+  color: var(--bi-on-surface-variant);
   font-size: 0.875rem;
 }
 
 .payment-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 
 .payment-edit-form {
   display: grid;
   grid-template-columns: repeat(4, 1fr) auto;
-  gap: 12px;
+  gap: var(--bi-space-2);
   align-items: center;
 }
 
@@ -378,6 +363,6 @@ async function handleDelete(payment: Payment): Promise<void> {
 
 .edit-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 </style>

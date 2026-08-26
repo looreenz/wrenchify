@@ -1,11 +1,10 @@
 <template>
-  <div class="line-items-editor">
-    <div class="section-header">
-      <h3>{{ $t('workOrder.lineItems') }}</h3>
+  <IndustrialCard :title="$t('workOrder.lineItems')" class="line-items-editor">
+    <template #header-actions>
       <n-button v-if="!readOnly" type="primary" size="small" @click="handleAdd">
         {{ $t('app.new') }}
       </n-button>
-    </div>
+    </template>
 
     <n-empty v-if="items.length === 0" :description="$t('app.empty')" />
 
@@ -64,7 +63,7 @@
       <strong>{{ $t('payment.runningTotal') }}:</strong>
       {{ formatCurrency(itemsTotal) }}
     </div>
-  </div>
+  </IndustrialCard>
 </template>
 
 <script setup lang="ts">
@@ -78,6 +77,7 @@ import {
   NSelect
 } from 'naive-ui'
 import { useWorkOrderStore } from '../stores/workOrders'
+import IndustrialCard from './industrial/IndustrialCard.vue'
 import type { WorkOrderItem, WorkOrderItemCreate, WorkOrderItemType } from '../../shared/types'
 
 const props = defineProps<{
@@ -193,35 +193,23 @@ async function handleDelete(item: WorkOrderItem): Promise<void> {
 
 <style scoped>
 .line-items-editor {
-  margin-top: 24px;
-}
-
-.section-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.section-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
+  margin-top: var(--bi-space-3);
 }
 
 .line-item-row {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
-  padding: 12px;
-  background-color: #f9f9f9;
-  border-radius: 6px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-2);
+  padding: var(--bi-space-2);
+  background-color: var(--bi-surface-container);
+  border-radius: var(--bi-radius-md);
 }
 
 .item-fields {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
-  gap: 12px;
+  gap: var(--bi-space-2);
   flex: 1;
   align-items: center;
 }
@@ -236,20 +224,28 @@ async function handleDelete(item: WorkOrderItem): Promise<void> {
   min-width: 100px;
 }
 
+.item-quantity,
+.item-price,
+.item-total {
+  font: var(--bi-data-mono);
+}
+
 .item-total {
   font-weight: 600;
   text-align: right;
   white-space: nowrap;
+  color: var(--bi-on-surface);
 }
 
 .item-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 
 .line-items-total {
-  margin-top: 16px;
+  margin-top: var(--bi-space-2);
   text-align: right;
   font-size: 1rem;
+  color: var(--bi-on-surface);
 }
 </style>
