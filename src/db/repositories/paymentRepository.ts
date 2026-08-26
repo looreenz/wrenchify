@@ -26,10 +26,9 @@ function validatePayment(data: PaymentCreate | PaymentUpdate, isCreate = false):
   }
 
   if (data.payment_date) {
-    const date = new Date(data.payment_date)
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    if (date > today) {
+    const now = new Date()
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+    if (data.payment_date > today) {
       throw new Error('Payment date cannot be in the future')
     }
   }
