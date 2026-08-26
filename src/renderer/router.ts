@@ -67,7 +67,7 @@ const router = createRouter({
         {
           path: 'quotes/:id',
           name: 'QuoteDetail',
-          component: () => import('./views/quotes/QuoteForm.vue')
+          component: () => import('./views/quotes/QuoteDetail.vue')
         },
         {
           path: 'quotes/:id/edit',
