@@ -1,0 +1,20 @@
+:root {
+  /* Font stacks — system fonts only */
+  --bi-font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --bi-font-mono: ui-monospace, 'SF Mono', Monaco, 'Cascadia Code', monospace;
+
+  /* Typography styles (size / weight / line-height) */
+  --bi-display-lg: 700 48px/56px var(--bi-font-sans);
+  --bi-display-lg-letter-spacing: -0.02em;
+
+  --bi-headline-lg: 700 32px/40px var(--bi-font-sans);
+  --bi-headline-md: 600 24px/32px var(--bi-font-sans);
+
+  --bi-body-lg: 400 18px/28px var(--bi-font-sans);
+  --bi-body-md: 400 16px/24px var(--bi-font-sans);
+
+  --bi-label-bold: 700 14px/20px var(--bi-font-mono);
+  --bi-label-bold-letter-spacing: 0.05em;
+
+  --bi-data-mono: 400 14px/20px var(--bi-font-mono);
+}

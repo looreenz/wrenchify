@@ -109,6 +109,14 @@
           <n-button v-if="!isReadOnly" type="primary" @click="handleSave">
             {{ $t('app.save') }}
           </n-button>
+          <HazardButton
+            v-if="quoteId !== null"
+            size="small"
+            :disabled="quoteStatus === 'converted'"
+            @click="handleDelete"
+          >
+            {{ $t('app.delete') }}
+          </HazardButton>
           <n-button @click="handleCancel">
             {{ $t('app.cancel') }}
           </n-button>
@@ -135,6 +143,7 @@ import {
   NSpin
 } from 'naive-ui'
 import { useQuoteStore } from '../../stores/quotes'
+import HazardButton from '../../components/industrial/HazardButton.vue'
 import { useCustomerStore } from '../../stores/customers'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useSettingsStore } from '../../stores/settings'
@@ -267,6 +276,17 @@ function handleCancel(): void {
   void router.push({ name: 'QuoteList' })
 }
 
+async function handleDelete(): Promise<void> {
+  if (quoteId.value === null) return
+  if (!window.confirm(t('app.confirmDelete'))) return
+  try {
+    await quoteStore.remove(quoteId.value)
+    void router.push({ name: 'QuoteList' })
+  } catch {
+    window.alert(t('app.error'))
+  }
+}
+
 async function handleSave(): Promise<void> {
   await formRef.value?.validate()
   const payload = makePayload()
@@ -309,7 +329,7 @@ function formatCurrency(value: number): string {
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: var(--bi-space-3);
 }
 
 .page-header h1 {
@@ -318,25 +338,25 @@ function formatCurrency(value: number): string {
 }
 
 .form {
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 8px;
+  background-color: var(--bi-surface-container-low);
+  padding: var(--bi-space-3);
+  border-radius: var(--bi-radius-lg);
 }
 
 .readonly-alert {
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--bi-space-2);
 }
 
 .form-row-three {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
+  gap: var(--bi-space-2);
 }
 
 .date-picker {
@@ -349,16 +369,16 @@ function formatCurrency(value: number): string {
 
 .total-cost {
   font-size: 1.1rem;
-  margin-bottom: 24px;
-  padding: 12px;
-  background-color: #f0f9eb;
-  border-radius: 6px;
-  color: #18a058;
+  margin-bottom: var(--bi-space-3);
+  padding: var(--bi-space-2);
+  background-color: var(--bi-surface-container-high);
+  border-radius: var(--bi-radius-md);
+  color: var(--bi-success);
 }
 
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--bi-space-2);
+  margin-top: var(--bi-space-3);
 }
 </style>

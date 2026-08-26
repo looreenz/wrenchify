@@ -1,0 +1,11 @@
+:root {
+  /* 8px grid */
+  --bi-space-1: 8px;
+  --bi-space-2: 16px;
+  --bi-space-3: 24px;
+  --bi-space-4: 32px;
+  --bi-space-5: 40px;
+
+  /* Touch target */
+  --bi-touch-target: 52px;
+}

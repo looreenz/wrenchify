@@ -23,12 +23,12 @@
 
         <div class="form-row">
           <n-form-item :label="$t('vehicle.licensePlate')" path="license_plate">
-            <n-input
-              v-model:value="formValue.license_plate"
-              :disabled="isReadOnly"
-              :placeholder="$t('vehicle.licensePlate')"
-              :input-props="{ 'data-testid': 'vehicle-license-plate' }"
-            />
+          <n-input
+            v-model:value="formValue.license_plate"
+            :disabled="isReadOnly"
+            :placeholder="$t('vehicle.licensePlate')"
+            :input-props="{ 'data-testid': 'vehicle-license-plate', class: 'mono-input' }"
+          />
           </n-form-item>
           <n-form-item :label="$t('vehicle.year')" path="year">
             <n-input-number
@@ -68,6 +68,7 @@
             :disabled="isReadOnly"
             :placeholder="$t('vehicle.vin')"
             :maxlength="17"
+            :input-props="{ class: 'mono-input' }"
           />
         </n-form-item>
 
@@ -88,6 +89,13 @@
           <n-button v-if="isReadOnly" type="primary" @click="handleEdit">
             {{ $t('app.edit') }}
           </n-button>
+          <HazardButton
+            v-if="vehicleId !== null"
+            size="small"
+            @click="handleDelete"
+          >
+            {{ $t('app.delete') }}
+          </HazardButton>
           <n-button @click="handleCancel">
             {{ $t('app.cancel') }}
           </n-button>
@@ -113,6 +121,7 @@ import {
 } from 'naive-ui'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useCustomerStore } from '../../stores/customers'
+import HazardButton from '../../components/industrial/HazardButton.vue'
 import type { VehicleCreate, VehicleUpdate } from '../../../shared/types'
 
 const route = useRoute()
@@ -239,6 +248,17 @@ function handleEdit(): void {
   }
 }
 
+async function handleDelete(): Promise<void> {
+  if (vehicleId.value === null) return
+  if (!window.confirm(t('vehicle.messages.deleteConfirm'))) return
+  try {
+    await vehicleStore.remove(vehicleId.value)
+    void router.push({ name: 'VehicleList' })
+  } catch {
+    window.alert(t('app.error'))
+  }
+}
+
 async function handleSave(): Promise<void> {
   await formRef.value?.validate()
   const payload = makePayload()
@@ -273,7 +293,7 @@ function makePayload(): VehicleCreate {
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: var(--bi-space-3);
 }
 
 .page-header h1 {
@@ -282,24 +302,28 @@ function makePayload(): VehicleCreate {
 }
 
 .form {
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 8px;
+  background-color: var(--bi-surface-container-low);
+  padding: var(--bi-space-3);
+  border-radius: var(--bi-radius-lg);
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--bi-space-2);
 }
 
 .year-input {
   width: 100%;
 }
 
+.mono-input {
+  font: var(--bi-data-mono);
+}
+
 .form-actions {
   display: flex;
-  gap: 12px;
-  margin-top: 24px;
+  gap: var(--bi-space-2);
+  margin-top: var(--bi-space-3);
 }
 </style>

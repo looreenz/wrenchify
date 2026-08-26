@@ -163,19 +163,20 @@ async function handleRestore(): Promise<void> {
 }
 
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: var(--bi-space-3);
 }
 
 .page-header h1 {
   margin: 0;
   font-size: 1.5rem;
+  color: var(--bi-on-surface);
 }
 
 .form {
-  background-color: #fff;
-  padding: 24px;
-  border-radius: 8px;
-  margin-bottom: 24px;
+  background-color: var(--bi-surface-container-low);
+  padding: var(--bi-space-3);
+  border-radius: var(--bi-radius-lg);
+  margin-bottom: var(--bi-space-3);
 }
 
 .number-input {
@@ -184,10 +185,10 @@ async function handleRestore(): Promise<void> {
 
 .backup-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--bi-space-2);
 }
 
 .backup-alert {
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 </style>

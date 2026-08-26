@@ -31,6 +31,8 @@
       striped
       class="vehicle-table"
     />
+
+    <n-empty v-if="filteredVehicles.length === 0" :description="$t('app.empty')" />
   </div>
 </template>
 
@@ -41,14 +43,15 @@ import { useI18n } from 'vue-i18n'
 import {
   NButton,
   NDataTable,
+  NEmpty,
   NInput,
   NSelect
 } from 'naive-ui'
+import type { DataTableColumns } from 'naive-ui'
 import { Pencil, Trash2, Clock } from 'lucide-vue-next'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useCustomerStore } from '../../stores/customers'
 import type { Vehicle } from '../../../shared/types'
-import type { DataTableColumns } from 'naive-ui'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -79,6 +82,76 @@ const customerOptions = computed(() => [
     value: c.id
   }))
 ])
+
+const columns = computed<DataTableColumns<Vehicle>>(() => [
+  {
+    title: t('vehicle.licensePlate'),
+    key: 'license_plate',
+    sorter: (a, b) => a.license_plate.localeCompare(b.license_plate),
+    render: (row) => h('span', { class: 'mono-text' }, row.license_plate)
+  },
+  {
+    title: t('vehicle.make'),
+    key: 'make',
+    sorter: (a, b) => (a.make ?? '').localeCompare(b.make ?? '')
+  },
+  {
+    title: t('vehicle.model'),
+    key: 'model',
+    sorter: (a, b) => a.model.localeCompare(b.model)
+  },
+  {
+    title: t('vehicle.year'),
+    key: 'year',
+    sorter: (a, b) => (a.year ?? 0) - (b.year ?? 0)
+  },
+  {
+    title: t('vehicle.customer'),
+    key: 'customer_id',
+    render: (row) => customerMap.value.get(row.customer_id) ?? ''
+  },
+  {
+    title: t('app.actions'),
+    key: 'actions',
+    render: renderActions
+  }
+])
+
+function renderActions(row: Vehicle) {
+  return h('div', { class: 'row-actions' }, [
+    h(
+      NButton,
+      {
+        size: 'small',
+        quaternary: true,
+        title: t('vehicle.timeline'),
+        onClick: () => handleTimeline(row)
+      },
+      { icon: () => h(Clock, { size: 16 }) }
+    ),
+    h(
+      NButton,
+      {
+        size: 'small',
+        quaternary: true,
+        title: t('app.edit'),
+        onClick: () => handleEdit(row)
+      },
+      { icon: () => h(Pencil, { size: 16 }) }
+    ),
+    h(
+      NButton,
+      {
+        size: 'small',
+        quaternary: true,
+        type: 'error',
+        title: t('app.delete'),
+        onClick: () => void handleDelete(row)
+      },
+      { icon: () => h(Trash2, { size: 16 }) }
+    )
+  ])
+}
 
 const filteredVehicles = computed(() => {
   let result = vehicleStore.vehicles
@@ -119,76 +192,15 @@ async function handleDelete(row: Vehicle): Promise<void> {
   if (!confirmed) return
   try {
     await vehicleStore.remove(row.id)
-  } catch {
-    window.alert(t('app.error'))
+  } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : String(err)
+    if (errorMessage.includes('Cannot delete vehicle with existing work orders')) {
+      window.alert(t('vehicle.messages.cannotDeleteWithWorkOrders'))
+    } else {
+      window.alert(t('app.error'))
+    }
   }
 }
-
-function renderActions(row: Vehicle) {
-  return h('div', { class: 'row-actions' }, [
-    h(
-      NButton,
-      {
-        size: 'small',
-        quaternary: true,
-        onClick: () => handleTimeline(row)
-      },
-      { icon: () => h(Clock, { size: 16 }) }
-    ),
-    h(
-      NButton,
-      {
-        size: 'small',
-        quaternary: true,
-        onClick: () => handleEdit(row)
-      },
-      { icon: () => h(Pencil, { size: 16 }) }
-    ),
-    h(
-      NButton,
-      {
-        size: 'small',
-        quaternary: true,
-        type: 'error',
-        onClick: () => void handleDelete(row)
-      },
-      { icon: () => h(Trash2, { size: 16 }) }
-    )
-  ])
-}
-
-const columns = computed<DataTableColumns<Vehicle>>(() => [
-  {
-    title: t('vehicle.licensePlate'),
-    key: 'license_plate',
-    sorter: (a, b) => a.license_plate.localeCompare(b.license_plate)
-  },
-  {
-    title: t('vehicle.make'),
-    key: 'make',
-    sorter: (a, b) => (a.make ?? '').localeCompare(b.make ?? '')
-  },
-  {
-    title: t('vehicle.model'),
-    key: 'model',
-    sorter: (a, b) => a.model.localeCompare(b.model)
-  },
-  {
-    title: t('vehicle.year'),
-    key: 'year',
-    sorter: (a, b) => (a.year ?? 0) - (b.year ?? 0)
-  },
-  {
-    title: t('vehicle.customer'),
-    key: 'customer_id',
-    render: (row) => customerMap.value.get(row.customer_id) ?? ''
-  },
-  {
-    title: t('app.actions'),
-    key: 'actions',
-    render: renderActions
-  }
-])
 </script>
 
 <style scoped>
@@ -200,7 +212,7 @@ const columns = computed<DataTableColumns<Vehicle>>(() => [
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .page-header h1 {
@@ -210,12 +222,12 @@ const columns = computed<DataTableColumns<Vehicle>>(() => [
 
 .filters {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-2);
 }
 
 .search-input {
-  max-width: 320px;
+  max-width: 400px;
   flex: 1;
 }
 
@@ -225,11 +237,15 @@ const columns = computed<DataTableColumns<Vehicle>>(() => [
 }
 
 .vehicle-table {
-  background-color: #fff;
+  background-color: var(--bi-surface-container);
+}
+
+.mono-text {
+  font: var(--bi-data-mono);
 }
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 </style>

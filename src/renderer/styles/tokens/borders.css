@@ -1,0 +1,11 @@
+:root {
+  /* Radius */
+  --bi-radius-sm: 0.125rem;
+  --bi-radius: 0.25rem;
+  --bi-radius-md: 0.375rem;
+  --bi-radius-lg: 0.5rem;
+
+  /* Borders */
+  --bi-border-thin: 1px solid var(--bi-outline);
+  --bi-border-active: 2px solid var(--bi-primary-container);
+}

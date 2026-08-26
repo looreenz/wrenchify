@@ -59,10 +59,10 @@ import {
   NButton,
   NDataTable,
   NDatePicker,
-  NSelect,
-  NTag
+  NSelect
 } from 'naive-ui'
 import { Pencil, Trash2 } from 'lucide-vue-next'
+import StatusLamp from '../../components/industrial/StatusLamp.vue'
 import { useWorkOrderStore } from '../../stores/workOrders'
 import { useCustomerStore } from '../../stores/customers'
 import { useVehicleStore } from '../../stores/vehicles'
@@ -144,14 +144,14 @@ async function handleDelete(row: WorkOrder): Promise<void> {
   }
 }
 
-function statusType(status: WorkOrderPaymentStatus): 'default' | 'warning' | 'success' {
+function paymentStatusColor(status: WorkOrderPaymentStatus): string {
   switch (status) {
     case 'paid':
-      return 'success'
+      return 'var(--bi-success)'
     case 'partial':
-      return 'warning'
+      return 'var(--bi-primary-container)'
     default:
-      return 'default'
+      return 'var(--bi-warning)'
   }
 }
 
@@ -163,11 +163,11 @@ function formatCurrency(value: number): string {
 }
 
 function renderStatus(row: WorkOrder) {
-  return h(
-    NTag,
-    { type: statusType(row.payment_status), size: 'small' },
-    { default: () => t(`workOrder.payment${capitalize(row.payment_status)}`) }
-  )
+  return h(StatusLamp, {
+    color: paymentStatusColor(row.payment_status),
+    size: 'sm',
+    label: t(`workOrder.payment${capitalize(row.payment_status)}`)
+  })
 }
 
 function capitalize(value: WorkOrderPaymentStatus): string {
@@ -247,18 +247,19 @@ const columns = computed<DataTableColumns<WorkOrder>>(() => [
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .page-header h1 {
   margin: 0;
   font-size: 1.5rem;
+  color: var(--bi-on-surface);
 }
 
 .filters {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-2);
   flex-wrap: wrap;
 }
 
@@ -270,11 +271,11 @@ const columns = computed<DataTableColumns<WorkOrder>>(() => [
 }
 
 .work-order-table {
-  background-color: #fff;
+  background-color: var(--bi-surface-container);
 }
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 </style>

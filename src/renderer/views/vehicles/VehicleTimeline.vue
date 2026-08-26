@@ -184,7 +184,7 @@ function statusType(status: WorkOrderPaymentStatus): 'default' | 'warning' | 'su
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: var(--bi-space-3);
 }
 
 .page-header h1 {
@@ -194,13 +194,13 @@ function statusType(status: WorkOrderPaymentStatus): 'default' | 'warning' | 'su
 
 .vehicle-subtitle {
   margin: 4px 0 0;
-  color: #666;
+  color: var(--bi-on-surface-variant);
 }
 
 .filters {
   display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-3);
   flex-wrap: wrap;
 }
 
@@ -212,22 +212,22 @@ function statusType(status: WorkOrderPaymentStatus): 'default' | 'warning' | 'su
 .timeline {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--bi-space-2);
 }
 
 .timeline-entry {
   display: flex;
-  gap: 16px;
-  background-color: #fff;
-  padding: 16px;
-  border-radius: 8px;
-  border-left: 4px solid #18a058;
+  gap: var(--bi-space-2);
+  background-color: var(--bi-surface-container);
+  padding: var(--bi-space-2);
+  border-radius: var(--bi-radius-lg);
+  border-left: 4px solid var(--bi-success);
 }
 
 .entry-date {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--bi-space-1);
   min-width: 120px;
 }
 
@@ -240,27 +240,27 @@ function statusType(status: WorkOrderPaymentStatus): 'default' | 'warning' | 'su
 }
 
 .entry-number {
-  margin: 0 0 8px;
+  margin: 0 0 var(--bi-space-1);
   font-weight: 600;
-  color: #333;
+  color: var(--bi-text);
 }
 
 .entry-description {
-  margin: 0 0 8px;
-  color: #555;
+  margin: 0 0 var(--bi-space-1);
+  color: var(--bi-on-surface-variant);
 }
 
 .entry-meta {
   display: flex;
-  gap: 16px;
+  gap: var(--bi-space-2);
   font-size: 0.875rem;
-  color: #666;
+  color: var(--bi-on-surface-variant);
 }
 
 .entry-cost {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #18a058;
+  color: var(--bi-success);
   white-space: nowrap;
 }
 </style>

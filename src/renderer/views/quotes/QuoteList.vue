@@ -49,11 +49,11 @@ import {
   NButton,
   NDataTable,
   NInput,
-  NSelect,
-  NTag
+  NSelect
 } from 'naive-ui'
 import { Pencil, Trash2, Eye } from 'lucide-vue-next'
 import { useQuoteStore } from '../../stores/quotes'
+import StatusLamp from '../../components/industrial/StatusLamp.vue'
 import { useCustomerStore } from '../../stores/customers'
 import { useVehicleStore } from '../../stores/vehicles'
 import type { Quote, QuoteStatus } from '../../../shared/types'
@@ -144,18 +144,6 @@ async function handleDelete(row: Quote): Promise<void> {
   }
 }
 
-function statusType(status: QuoteStatus): 'default' | 'success' | 'error' | 'warning' {
-  switch (status) {
-    case 'accepted':
-    case 'converted':
-      return 'success'
-    case 'rejected':
-      return 'error'
-    default:
-      return 'default'
-  }
-}
-
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('it-IT', {
     style: 'currency',
@@ -163,12 +151,26 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
+function quoteStatusColor(status: QuoteStatus): string {
+  switch (status) {
+    case 'accepted':
+      return 'var(--bi-success)'
+    case 'rejected':
+      return 'var(--bi-error)'
+    case 'converted':
+      return 'var(--bi-primary-container)'
+    default:
+      return 'var(--bi-tertiary-container)'
+  }
+}
+
 function renderStatus(row: Quote) {
-  return h(
-    NTag,
-    { type: statusType(row.status), size: 'small' },
-    { default: () => t(`quote.status${row.status.charAt(0).toUpperCase()}${row.status.slice(1)}`) }
-  )
+  const label = t(`quote.status${row.status.charAt(0).toUpperCase()}${row.status.slice(1)}`)
+  return h(StatusLamp, {
+    color: quoteStatusColor(row.status),
+    size: 'sm',
+    label
+  })
 }
 
 function renderActions(row: Quote) {
@@ -255,7 +257,7 @@ const columns = computed<DataTableColumns<Quote>>(() => [
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .page-header h1 {
@@ -265,8 +267,8 @@ const columns = computed<DataTableColumns<Quote>>(() => [
 
 .filters {
   display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
+  gap: var(--bi-space-2);
+  margin-bottom: var(--bi-space-2);
   flex-wrap: wrap;
 }
 
@@ -282,11 +284,11 @@ const columns = computed<DataTableColumns<Quote>>(() => [
 }
 
 .quote-table {
-  background-color: #fff;
+  background-color: var(--bi-surface-container);
 }
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 </style>

@@ -149,7 +149,7 @@ const columns = computed<DataTableColumns<CustomerWithVehicleCount>>(() => [
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .page-header h1 {
@@ -159,15 +159,15 @@ const columns = computed<DataTableColumns<CustomerWithVehicleCount>>(() => [
 
 .search-input {
   max-width: 400px;
-  margin-bottom: 16px;
+  margin-bottom: var(--bi-space-2);
 }
 
 .customer-table {
-  background-color: #fff;
+  background-color: var(--bi-surface-container);
 }
 
 .row-actions {
   display: flex;
-  gap: 8px;
+  gap: var(--bi-space-1);
 }
 </style>
