@@ -178,6 +178,10 @@
     "currency": "Moneda",
     "languageIt": "Italiano",
     "languageEs": "Español",
+    "exportBackup": "Exportar backup",
+    "restoreBackup": "Restaurar backup",
+    "exportSuccess": "Backup exportado a {path}",
+    "restoreSuccess": "Backup restaurado. La aplicación se reiniciará.",
     "validation": {
       "hourlyRatePositive": "La tarifa por hora debe ser mayor o igual a cero"
     }
