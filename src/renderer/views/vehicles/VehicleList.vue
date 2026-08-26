@@ -23,32 +23,91 @@
       />
     </div>
 
-    <n-data-table
-      :columns="columns"
-      :data="filteredVehicles"
-      :loading="vehicleStore.loading"
-      :row-key="(row) => row.id"
-      striped
-      class="vehicle-table"
-    />
+    <div class="vehicle-grid">
+      <IndustrialCard
+        v-for="vehicle in filteredVehicles"
+        :key="vehicle.id"
+        class="vehicle-card"
+      >
+        <template #title>
+          <span class="mono-text">{{ vehicle.license_plate }}</span>
+        </template>
+        <template #header-actions>
+          <div class="row-actions">
+            <n-button
+              size="small"
+              quaternary
+              :title="$t('vehicle.timeline')"
+              @click="handleTimeline(vehicle)"
+            >
+              <template #icon>
+                <Clock :size="16" />
+              </template>
+            </n-button>
+            <n-button
+              size="small"
+              quaternary
+              :title="$t('app.edit')"
+              @click="handleEdit(vehicle)"
+            >
+              <template #icon>
+                <Pencil :size="16" />
+              </template>
+            </n-button>
+            <n-button
+              size="small"
+              quaternary
+              type="error"
+              :title="$t('app.delete')"
+              @click="void handleDelete(vehicle)"
+            >
+              <template #icon>
+                <Trash2 :size="16" />
+              </template>
+            </n-button>
+          </div>
+        </template>
+
+        <div class="vehicle-fields">
+          <div class="vehicle-field">
+            <span class="field-label">{{ $t('vehicle.make') }}</span>
+            <span class="field-value">{{ vehicle.make ?? '-' }}</span>
+          </div>
+          <div class="vehicle-field">
+            <span class="field-label">{{ $t('vehicle.model') }}</span>
+            <span class="field-value">{{ vehicle.model }}</span>
+          </div>
+          <div class="vehicle-field">
+            <span class="field-label">{{ $t('vehicle.year') }}</span>
+            <span class="field-value">{{ vehicle.year ?? '-' }}</span>
+          </div>
+          <div class="vehicle-field">
+            <span class="field-label">{{ $t('vehicle.customer') }}</span>
+            <span class="field-value">{{ customerMap.get(vehicle.customer_id) ?? '' }}</span>
+          </div>
+        </div>
+      </IndustrialCard>
+    </div>
+
+    <n-empty v-if="filteredVehicles.length === 0" :description="$t('app.empty')" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, h, onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import {
   NButton,
-  NDataTable,
+  NEmpty,
   NInput,
   NSelect
 } from 'naive-ui'
 import { Pencil, Trash2, Clock } from 'lucide-vue-next'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useCustomerStore } from '../../stores/customers'
+import IndustrialCard from '../../components/industrial/IndustrialCard.vue'
 import type { Vehicle } from '../../../shared/types'
-import type { DataTableColumns } from 'naive-ui'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -123,73 +182,6 @@ async function handleDelete(row: Vehicle): Promise<void> {
     window.alert(t('app.error'))
   }
 }
-
-function renderActions(row: Vehicle) {
-  return h('div', { class: 'row-actions' }, [
-    h(
-      NButton,
-      {
-        size: 'small',
-        quaternary: true,
-        onClick: () => handleTimeline(row)
-      },
-      { icon: () => h(Clock, { size: 16 }) }
-    ),
-    h(
-      NButton,
-      {
-        size: 'small',
-        quaternary: true,
-        onClick: () => handleEdit(row)
-      },
-      { icon: () => h(Pencil, { size: 16 }) }
-    ),
-    h(
-      NButton,
-      {
-        size: 'small',
-        quaternary: true,
-        type: 'error',
-        onClick: () => void handleDelete(row)
-      },
-      { icon: () => h(Trash2, { size: 16 }) }
-    )
-  ])
-}
-
-  const columns = computed<DataTableColumns<Vehicle>>(() => [
-  {
-    title: t('vehicle.licensePlate'),
-    key: 'license_plate',
-    sorter: (a, b) => a.license_plate.localeCompare(b.license_plate),
-    render: (row) => h('span', { class: 'mono-text' }, row.license_plate)
-  },
-  {
-    title: t('vehicle.make'),
-    key: 'make',
-    sorter: (a, b) => (a.make ?? '').localeCompare(b.make ?? '')
-  },
-  {
-    title: t('vehicle.model'),
-    key: 'model',
-    sorter: (a, b) => a.model.localeCompare(b.model)
-  },
-  {
-    title: t('vehicle.year'),
-    key: 'year',
-    sorter: (a, b) => (a.year ?? 0) - (b.year ?? 0)
-  },
-  {
-    title: t('vehicle.customer'),
-    key: 'customer_id',
-    render: (row) => customerMap.value.get(row.customer_id) ?? ''
-  },
-  {
-    title: t('app.actions'),
-    key: 'actions',
-    render: renderActions
-  }
-])
 </script>
 
 <style scoped>
@@ -207,6 +199,7 @@ function renderActions(row: Vehicle) {
 .page-header h1 {
   margin: 0;
   font-size: 1.5rem;
+  color: var(--bi-on-surface);
 }
 
 .filters {
@@ -225,8 +218,39 @@ function renderActions(row: Vehicle) {
   flex: 1;
 }
 
-.vehicle-table {
-  background-color: var(--bi-surface-container);
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--bi-space-2);
+}
+
+.vehicle-card :deep(.industrial-card__title) {
+  font: var(--bi-data-mono);
+  text-transform: uppercase;
+}
+
+.vehicle-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bi-space-2);
+}
+
+.vehicle-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.field-label {
+  font: var(--bi-label-bold);
+  letter-spacing: var(--bi-label-bold-letter-spacing);
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--bi-on-surface-variant);
+}
+
+.field-value {
+  color: var(--bi-on-surface);
 }
 
 .mono-text {

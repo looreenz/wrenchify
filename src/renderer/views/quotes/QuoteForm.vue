@@ -109,6 +109,14 @@
           <n-button v-if="!isReadOnly" type="primary" @click="handleSave">
             {{ $t('app.save') }}
           </n-button>
+          <HazardButton
+            v-if="quoteId !== null"
+            size="small"
+            :disabled="quoteStatus === 'converted'"
+            @click="handleDelete"
+          >
+            {{ $t('app.delete') }}
+          </HazardButton>
           <n-button @click="handleCancel">
             {{ $t('app.cancel') }}
           </n-button>
@@ -135,6 +143,7 @@ import {
   NSpin
 } from 'naive-ui'
 import { useQuoteStore } from '../../stores/quotes'
+import HazardButton from '../../components/industrial/HazardButton.vue'
 import { useCustomerStore } from '../../stores/customers'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useSettingsStore } from '../../stores/settings'
@@ -265,6 +274,17 @@ function handleCustomerChange(): void {
 
 function handleCancel(): void {
   void router.push({ name: 'QuoteList' })
+}
+
+async function handleDelete(): Promise<void> {
+  if (quoteId.value === null) return
+  if (!window.confirm(t('app.confirmDelete'))) return
+  try {
+    await quoteStore.remove(quoteId.value)
+    void router.push({ name: 'QuoteList' })
+  } catch {
+    window.alert(t('app.error'))
+  }
 }
 
 async function handleSave(): Promise<void> {

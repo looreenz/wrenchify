@@ -91,6 +91,13 @@
           <n-button v-if="isReadOnly" type="primary" @click="handleEdit">
             {{ $t('app.edit') }}
           </n-button>
+          <HazardButton
+            v-if="customerId !== null"
+            size="small"
+            @click="handleDelete"
+          >
+            {{ $t('app.delete') }}
+          </HazardButton>
           <n-button @click="handleCancel">
             {{ $t('app.cancel') }}
           </n-button>
@@ -114,6 +121,7 @@ import {
   NSpin
 } from 'naive-ui'
 import { useCustomerStore } from '../../stores/customers'
+import HazardButton from '../../components/industrial/HazardButton.vue'
 import type { CustomerCreate, CustomerUpdate, Language } from '../../../shared/types'
 
 const route = useRoute()
@@ -196,6 +204,17 @@ function handleCancel(): void {
 function handleEdit(): void {
   if (customerId.value !== null) {
     void router.push({ name: 'CustomerEdit', params: { id: String(customerId.value) } })
+  }
+}
+
+async function handleDelete(): Promise<void> {
+  if (customerId.value === null) return
+  if (!window.confirm(t('app.confirmDelete'))) return
+  try {
+    await customerStore.remove(customerId.value)
+    void router.push({ name: 'CustomerList' })
+  } catch {
+    window.alert(t('app.error'))
   }
 }
 

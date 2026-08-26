@@ -53,6 +53,7 @@ import {
 } from 'naive-ui'
 import { Pencil, Trash2, Eye } from 'lucide-vue-next'
 import { useQuoteStore } from '../../stores/quotes'
+import StatusLamp from '../../components/industrial/StatusLamp.vue'
 import { useCustomerStore } from '../../stores/customers'
 import { useVehicleStore } from '../../stores/vehicles'
 import type { Quote, QuoteStatus } from '../../../shared/types'
@@ -150,12 +151,26 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
+function quoteStatusColor(status: QuoteStatus): string {
+  switch (status) {
+    case 'accepted':
+      return 'var(--bi-success)'
+    case 'rejected':
+      return 'var(--bi-error)'
+    case 'converted':
+      return 'var(--bi-primary-container)'
+    default:
+      return 'var(--bi-tertiary-container)'
+  }
+}
+
 function renderStatus(row: Quote) {
   const label = t(`quote.status${row.status.charAt(0).toUpperCase()}${row.status.slice(1)}`)
-  return h('span', { class: `status-lamp status-${row.status}` }, [
-    h('span', { class: 'status-lamp-indicator' }),
-    h('span', { class: 'status-lamp-label' }, label)
-  ])
+  return h(StatusLamp, {
+    color: quoteStatusColor(row.status),
+    size: 'sm',
+    label
+  })
 }
 
 function renderActions(row: Quote) {
@@ -270,40 +285,6 @@ const columns = computed<DataTableColumns<Quote>>(() => [
 
 .quote-table {
   background-color: var(--bi-surface-container);
-}
-
-.status-lamp {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--bi-space-1);
-}
-
-.status-lamp-indicator {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background-color: var(--bi-tertiary-container);
-  box-shadow: 0 0 8px var(--bi-tertiary-container);
-}
-
-.status-draft .status-lamp-indicator {
-  background-color: var(--bi-tertiary-container);
-  box-shadow: 0 0 8px var(--bi-tertiary-container);
-}
-
-.status-accepted .status-lamp-indicator {
-  background-color: var(--bi-success);
-  box-shadow: 0 0 8px var(--bi-success);
-}
-
-.status-rejected .status-lamp-indicator {
-  background-color: var(--bi-error);
-  box-shadow: 0 0 8px var(--bi-error);
-}
-
-.status-converted .status-lamp-indicator {
-  background-color: var(--bi-primary-container);
-  box-shadow: 0 0 8px var(--bi-primary-container);
 }
 
 .row-actions {

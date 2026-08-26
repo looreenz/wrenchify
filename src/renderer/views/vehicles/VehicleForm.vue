@@ -89,6 +89,13 @@
           <n-button v-if="isReadOnly" type="primary" @click="handleEdit">
             {{ $t('app.edit') }}
           </n-button>
+          <HazardButton
+            v-if="vehicleId !== null"
+            size="small"
+            @click="handleDelete"
+          >
+            {{ $t('app.delete') }}
+          </HazardButton>
           <n-button @click="handleCancel">
             {{ $t('app.cancel') }}
           </n-button>
@@ -114,6 +121,7 @@ import {
 } from 'naive-ui'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useCustomerStore } from '../../stores/customers'
+import HazardButton from '../../components/industrial/HazardButton.vue'
 import type { VehicleCreate, VehicleUpdate } from '../../../shared/types'
 
 const route = useRoute()
@@ -237,6 +245,17 @@ function handleCancel(): void {
 function handleEdit(): void {
   if (vehicleId.value !== null) {
     void router.push({ name: 'VehicleEdit', params: { id: String(vehicleId.value) } })
+  }
+}
+
+async function handleDelete(): Promise<void> {
+  if (vehicleId.value === null) return
+  if (!window.confirm(t('vehicle.messages.deleteConfirm'))) return
+  try {
+    await vehicleStore.remove(vehicleId.value)
+    void router.push({ name: 'VehicleList' })
+  } catch {
+    window.alert(t('app.error'))
   }
 }
 
