@@ -64,23 +64,23 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3: UI Shell + Customer/Vehicle (Batch 3 — PR 3)
 
-- [ ] **T014** Vue app entry + router | `src/renderer/index.ts`, `src/renderer/router.ts` | ~90 lines | Deps: T001, T005 | Priority: high
+- [x] **T014** Vue app entry + router | `src/renderer/index.ts`, `src/renderer/router.ts` | ~90 lines | Deps: T001, T005 | Priority: high
   - Vue 3 + Pinia + vue-i18n + Naive UI setup. Vue Router with all routes (customers, vehicles, quotes, work-orders, settings).
-- [ ] **T015** MainLayout | `src/renderer/layouts/MainLayout.vue` | ~80 lines | Deps: T014 | Priority: high
+- [x] **T015** MainLayout | `src/renderer/layouts/MainLayout.vue` | ~80 lines | Deps: T014 | Priority: high
   - Sidebar nav (Naive UI Menu) with Lucide icons. Router-view content area. Responsive.
-- [ ] **T016** Pinia stores (6 domains) | `src/renderer/stores/{customers,vehicles,quotes,workOrders,payments,settings}.ts` | ~290 lines | Deps: T002, T013 | Priority: high
+- [x] **T016** Pinia stores (6 domains) | `src/renderer/stores/{customers,vehicles,quotes,workOrders,payments,settings}.ts` | ~290 lines | Deps: T002, T013 | Priority: high
   - One store per domain. Each: state (items[], loading), actions (fetch, create, update, remove). Calls `window.wrenchify.*`.
-- [ ] **T017** Full i18n dictionaries | `src/i18n/it.json`, `src/i18n/es.json` | ~400 lines | Deps: T005 | Priority: high
+- [x] **T017** Full i18n dictionaries | `src/i18n/it.json`, `src/i18n/es.json` | ~400 lines | Deps: T005 | Priority: high
   - All UI strings: nav, forms, lists, buttons, validations, statuses, settings, backup. Identical key structure.
-- [ ] **T018** Customer list view | `src/renderer/views/customers/CustomerList.vue` | ~120 lines | Deps: T015, T016, T017 | Priority: high
+- [x] **T018** Customer list view | `src/renderer/views/customers/CustomerList.vue` | ~120 lines | Deps: T015, T016, T017 | Priority: high
   - Naive UI DataTable, search input, empty state, link to create/edit/detail.
-- [ ] **T019** Customer form view | `src/renderer/views/customers/CustomerForm.vue` | ~150 lines | Deps: T015, T016, T017 | Priority: high
+- [x] **T019** Customer form view | `src/renderer/views/customers/CustomerForm.vue` | ~150 lines | Deps: T015, T016, T017 | Priority: high
   - Create/edit form with validation (required fields, email format). Naive UI Form component.
-- [ ] **T020** Vehicle list view | `src/renderer/views/vehicles/VehicleList.vue` | ~100 lines | Deps: T015, T016, T017 | Priority: high
+- [x] **T020** Vehicle list view | `src/renderer/views/vehicles/VehicleList.vue` | ~100 lines | Deps: T015, T016, T017 | Priority: high
   - Filtered by customer option. Shows license plate, make, model, year.
-- [ ] **T021** Vehicle form view | `src/renderer/views/vehicles/VehicleForm.vue` | ~140 lines | Deps: T015, T016, T017 | Priority: high
+- [x] **T021** Vehicle form view | `src/renderer/views/vehicles/VehicleForm.vue` | ~140 lines | Deps: T015, T016, T017 | Priority: high
   - Customer pre-selected (from route query). Year validation. License plate uppercase.
-- [ ] **T022** Vehicle timeline view | `src/renderer/views/vehicles/VehicleTimeline.vue` | ~120 lines | Deps: T015, T016, T017 | Priority: medium
+- [x] **T022** Vehicle timeline view | `src/renderer/views/vehicles/VehicleTimeline.vue` | ~120 lines | Deps: T015, T016, T017 | Priority: medium
   - Chronological WO list. Date, mileage, cost, payment status. CSS mileage progression indicator.
 
 **Batch 3 total: ~1,490 lines**
