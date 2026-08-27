@@ -314,10 +314,11 @@ async function handleSave(): Promise<void> {
   try {
     if (isEdit.value && quoteId.value !== null) {
       await quoteStore.update(quoteId.value, payload as QuoteUpdate)
+      void router.push({ name: 'QuoteList' })
     } else {
-      await quoteStore.create(payload as QuoteCreate)
+      const created = await quoteStore.create(payload as QuoteCreate)
+      void router.push({ name: 'QuoteEdit', params: { id: String(created.id) } })
     }
-    void router.push({ name: 'QuoteList' })
   } catch {
     window.alert(t('app.error'))
   }
