@@ -18,6 +18,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   const hourlyRate = computed(() => settings.value.hourly_rate)
   const defaultLanguage = computed(() => settings.value.default_language)
+  const vatRate = computed(() => settings.value.vat_rate)
 
   async function load(): Promise<void> {
     loading.value = true
@@ -52,6 +53,7 @@ export const useSettingsStore = defineStore('settings', () => {
     error,
     hourlyRate,
     defaultLanguage,
+    vatRate,
     load,
     update,
     getSetting

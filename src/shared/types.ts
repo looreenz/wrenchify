@@ -136,8 +136,6 @@ export interface QuoteItemUpdate {
   item_type?: WorkOrderItemType
 }
 
-// Transitional type: legacy parts_cost/total_cost coexist with dual-pricing fields.
-// Phase 2 will remove the legacy fields once repositories are updated.
 export interface Quote {
   id: number
   vehicle_id: number
@@ -148,8 +146,6 @@ export interface Quote {
   description: string | null
   labor_hours: number
   hourly_rate: number
-  parts_cost: number
-  total_cost: number
   vat_rate: number
   customer_total: number
   workshop_total: number
@@ -165,7 +161,6 @@ export interface QuoteCreate {
   description?: string | null
   labor_hours?: number
   hourly_rate?: number
-  parts_cost?: number
   notes?: string | null
 }
 
@@ -176,7 +171,6 @@ export interface QuoteUpdate {
   description?: string | null
   labor_hours?: number
   hourly_rate?: number
-  parts_cost?: number
   notes?: string | null
   status?: QuoteStatus
 }
@@ -187,8 +181,6 @@ export interface QuoteFilter {
   status?: QuoteStatus
 }
 
-// Transitional type: legacy parts_cost/total_cost coexist with dual-pricing fields.
-// Phase 2 will remove the legacy fields once repositories are updated.
 export interface WorkOrder {
   id: number
   vehicle_id: number
@@ -202,8 +194,6 @@ export interface WorkOrder {
   description: string | null
   labor_hours: number
   hourly_rate: number
-  parts_cost: number
-  total_cost: number
   vat_rate: number
   customer_total: number
   workshop_total: number
@@ -224,7 +214,6 @@ export interface WorkOrderCreate {
   description?: string | null
   labor_hours?: number
   hourly_rate?: number
-  parts_cost?: number
   notes?: string | null
 }
 
@@ -239,7 +228,6 @@ export interface WorkOrderUpdate {
   description?: string | null
   labor_hours?: number
   hourly_rate?: number
-  parts_cost?: number
   notes?: string | null
 }
 
@@ -251,14 +239,11 @@ export interface WorkOrderFilter {
   payment_status?: WorkOrderPaymentStatus
 }
 
-// Transitional type: legacy unit_price coexists with dual-pricing fields.
-// Phase 2 will remove unit_price once repositories are updated.
 export interface WorkOrderItem {
   id: number
   work_order_id: number
   description: string
   quantity: number
-  unit_price: number
   customer_price: number
   workshop_price: number
   item_type: WorkOrderItemType
@@ -269,7 +254,6 @@ export interface WorkOrderItem {
 export interface WorkOrderItemCreate {
   description: string
   quantity?: number
-  unit_price?: number
   customer_price?: number
   workshop_price?: number
   item_type?: WorkOrderItemType
@@ -278,7 +262,6 @@ export interface WorkOrderItemCreate {
 export interface WorkOrderItemUpdate {
   description?: string
   quantity?: number
-  unit_price?: number
   customer_price?: number
   workshop_price?: number
   item_type?: WorkOrderItemType

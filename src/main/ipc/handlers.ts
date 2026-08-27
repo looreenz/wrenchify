@@ -15,6 +15,8 @@ import type {
   QuoteCreate,
   QuoteUpdate,
   QuoteFilter,
+  QuoteItemCreate,
+  QuoteItemUpdate,
   WorkOrderCreate,
   WorkOrderUpdate,
   WorkOrderFilter,
@@ -92,6 +94,22 @@ export function registerAllHandlers(): void {
 
   ipcMain.handle('quotes:convert', async (_event, id: number) => {
     return quoteRepository.convert(id)
+  })
+
+  ipcMain.handle('quotes:getLineItems', async (_event, quoteId: number) => {
+    return quoteRepository.getLineItems(quoteId)
+  })
+
+  ipcMain.handle('quotes:addLineItem', async (_event, quoteId: number, data: QuoteItemCreate) => {
+    return quoteRepository.addLineItem(quoteId, data)
+  })
+
+  ipcMain.handle('quotes:updateLineItem', async (_event, itemId: number, data: QuoteItemUpdate) => {
+    return quoteRepository.updateLineItem(itemId, data)
+  })
+
+  ipcMain.handle('quotes:deleteLineItem', async (_event, itemId: number) => {
+    return quoteRepository.deleteLineItem(itemId)
   })
 
   ipcMain.handle('workOrders:list', async (_event, filter?: WorkOrderFilter) => {

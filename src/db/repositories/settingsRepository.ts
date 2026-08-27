@@ -56,6 +56,14 @@ export function getHourlyRate(): number {
   return row ? Number(row.value) : DEFAULT_SETTINGS.hourly_rate
 }
 
+export function getVatRate(): number {
+  const db = getDatabase()
+  const row = db.prepare("SELECT value FROM settings WHERE key = 'vat_rate'").get() as
+    | { value: string }
+    | undefined
+  return row ? Number(row.value) : DEFAULT_SETTINGS.vat_rate
+}
+
 export function update(key: SettingKey, value: string): void {
   const db = getDatabase()
 
@@ -91,5 +99,6 @@ export function update(key: SettingKey, value: string): void {
 export const settingsRepository = {
   getAll,
   getHourlyRate,
+  getVatRate,
   update
 }

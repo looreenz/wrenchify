@@ -9,11 +9,8 @@ import type {
   WorkOrderPaymentStatus
 } from '../../shared/types'
 import { getDatabase } from '../connection'
-import { getHourlyRate } from './settingsRepository'
-
-function roundCost(value: number): number {
-  return Math.round(value * 100) / 100
-}
+import { getHourlyRate, getVatRate } from './settingsRepository'
+import { calcTotals } from '../../shared/calcTotals'
 
 function getTodayPrefix(prefix: string): string {
   const now = new Date()
@@ -36,22 +33,6 @@ function generateOrderNumber(db: ReturnType<typeof getDatabase>): string {
   }
 
   return `${todayPrefix}${String(next).padStart(3, '0')}`
-}
-
-function calculateWorkOrderTotal(
-  db: ReturnType<typeof getDatabase>,
-  workOrder: {
-    id?: number
-    labor_hours: number
-    hourly_rate: number
-    parts_cost: number
-  }
-): number {
-  const itemsTotal = db
-    .prepare('SELECT COALESCE(SUM(quantity * unit_price), 0) AS total FROM work_order_items WHERE work_order_id = ?')
-    .get(workOrder.id ?? 0) as { total: number }
-
-  return roundCost(workOrder.labor_hours * workOrder.hourly_rate + workOrder.parts_cost + Number(itemsTotal.total))
 }
 
 function resolvePaymentStatus(totalCost: number, paidAmount: number): WorkOrderPaymentStatus {
@@ -81,25 +62,29 @@ export function recalculatePaymentStatus(workOrderId: number): void {
   )
 }
 
-export function recalculateTotalCost(workOrderId: number): void {
+function getLineItemsRaw(workOrderId: number): WorkOrderItem[] {
   const db = getDatabase()
+  const rows = db
+    .prepare('SELECT * FROM work_order_items WHERE work_order_id = ? ORDER BY id')
+    .all(workOrderId) as Record<string, unknown>[]
+  return rows.map(mapItemRow)
+}
 
+export function recalculateTotals(workOrderId: number): void {
+  const db = getDatabase()
   const workOrder = getById(workOrderId)
   if (!workOrder) {
     throw new Error(`Work order ${workOrderId} not found`)
   }
 
-  const totalCost = calculateWorkOrderTotal(db, {
-    id: workOrderId,
-    labor_hours: workOrder.labor_hours,
-    hourly_rate: workOrder.hourly_rate,
-    parts_cost: workOrder.parts_cost
-  })
+  const items = getLineItemsRaw(workOrderId)
+  const totals = calcTotals(items, workOrder.labor_hours, workOrder.hourly_rate, workOrder.vat_rate)
 
-  db.prepare('UPDATE work_orders SET total_cost = ?, updated_at = datetime(\'now\') WHERE id = ?').run(
-    totalCost,
-    workOrderId
-  )
+  db.prepare(
+    `UPDATE work_orders
+     SET customer_total = ?, workshop_total = ?, updated_at = datetime('now')
+     WHERE id = ?`
+  ).run(totals.customer_total, totals.workshop_total, workOrderId)
 }
 
 function validateMileage(mileageIn?: number | null, mileageOut?: number | null): void {
@@ -125,10 +110,8 @@ function mapRow(row: unknown): WorkOrder {
     description: r.description as string | null,
     labor_hours: Number(r.labor_hours ?? 0),
     hourly_rate: Number(r.hourly_rate ?? 0),
-    parts_cost: Number(r.parts_cost ?? 0),
-    total_cost: Number(r.total_cost ?? 0),
     vat_rate: Number(r.vat_rate ?? 0.21),
-    customer_total: Number(r.customer_total ?? r.total_cost ?? 0),
+    customer_total: Number(r.customer_total ?? 0),
     workshop_total: Number(r.workshop_total ?? 0),
     payment_status: r.payment_status as WorkOrderPaymentStatus,
     notes: r.notes as string | null,
@@ -144,8 +127,7 @@ function mapItemRow(row: unknown): WorkOrderItem {
     work_order_id: r.work_order_id as number,
     description: r.description as string,
     quantity: Number(r.quantity ?? 1),
-    unit_price: Number(r.unit_price ?? 0),
-    customer_price: Number(r.customer_price ?? r.unit_price ?? 0),
+    customer_price: Number(r.customer_price ?? 0),
     workshop_price: Number(r.workshop_price ?? 0),
     item_type: r.item_type as 'parts' | 'labor',
     created_at: r.created_at as string,
@@ -204,7 +186,7 @@ export function create(data: WorkOrderCreate): WorkOrder {
   const dateIn = data.date_in ?? new Date().toISOString().slice(0, 10)
   const hourlyRate = data.hourly_rate ?? getHourlyRate()
   const laborHours = data.labor_hours ?? 0
-  const partsCost = data.parts_cost ?? 0
+  const vatRate = getVatRate()
   const orderNumber = generateOrderNumber(db)
 
   const result = db
@@ -212,8 +194,8 @@ export function create(data: WorkOrderCreate): WorkOrder {
       `
       INSERT INTO work_orders (
         vehicle_id, customer_id, quote_id, order_number, date_in, date_out,
-        mileage_in, mileage_out, description, labor_hours, hourly_rate, parts_cost, total_cost, payment_status, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+        mileage_in, mileage_out, description, labor_hours, hourly_rate, vat_rate, customer_total, workshop_total, payment_status, notes
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, 'pending', ?)
     `
     )
     .run(
@@ -228,13 +210,12 @@ export function create(data: WorkOrderCreate): WorkOrder {
       data.description ?? null,
       laborHours,
       hourlyRate,
-      partsCost,
-      0,
+      vatRate,
       data.notes ?? null
     )
 
   const workOrderId = Number(result.lastInsertRowid)
-  recalculateTotalCost(workOrderId)
+  recalculateTotals(workOrderId)
 
   const workOrder = getById(workOrderId)
   if (!workOrder) {
@@ -261,7 +242,6 @@ export function update(id: number, data: WorkOrderUpdate): WorkOrder {
   const description = 'description' in data ? data.description : existing.description
   const laborHours = 'labor_hours' in data ? data.labor_hours : existing.labor_hours
   const hourlyRate = 'hourly_rate' in data ? data.hourly_rate : existing.hourly_rate
-  const partsCost = 'parts_cost' in data ? data.parts_cost : existing.parts_cost
   const notes = 'notes' in data ? data.notes : existing.notes
 
   validateMileage(mileageIn, mileageOut)
@@ -280,7 +260,6 @@ export function update(id: number, data: WorkOrderUpdate): WorkOrder {
           description = ?,
           labor_hours = ?,
           hourly_rate = ?,
-          parts_cost = ?,
           notes = ?,
           updated_at = datetime('now')
       WHERE id = ?
@@ -297,7 +276,6 @@ export function update(id: number, data: WorkOrderUpdate): WorkOrder {
       description ?? null,
       laborHours ?? 0,
       hourlyRate ?? 0,
-      partsCost ?? 0,
       notes ?? null,
       id
     )
@@ -306,7 +284,7 @@ export function update(id: number, data: WorkOrderUpdate): WorkOrder {
     throw new Error(`Work order ${id} not updated`)
   }
 
-  recalculateTotalCost(id)
+  recalculateTotals(id)
 
   const workOrder = getById(id)
   if (!workOrder) {
@@ -330,11 +308,7 @@ export function remove(id: number): void {
 }
 
 export function getLineItems(workOrderId: number): WorkOrderItem[] {
-  const db = getDatabase()
-  const rows = db
-    .prepare('SELECT * FROM work_order_items WHERE work_order_id = ? ORDER BY id')
-    .all(workOrderId) as Record<string, unknown>[]
-  return rows.map(mapItemRow)
+  return getLineItemsRaw(workOrderId)
 }
 
 export function addLineItem(workOrderId: number, data: WorkOrderItemCreate): WorkOrderItem {
@@ -350,27 +324,28 @@ export function addLineItem(workOrderId: number, data: WorkOrderItemCreate): Wor
   }
 
   const quantity = data.quantity ?? 1
-  const unitPrice = data.unit_price ?? 0
+  const customerPrice = data.customer_price ?? 0
+  const workshopPrice = data.workshop_price ?? 0
   const itemType = data.item_type ?? 'parts'
 
   if (quantity <= 0) {
     throw new Error('Quantity must be greater than zero')
   }
 
-  if (unitPrice < 0) {
-    throw new Error('Unit price must be non-negative')
+  if (customerPrice < 0 || workshopPrice < 0) {
+    throw new Error('Price must be non-negative')
   }
 
   const result = db
     .prepare(
       `
-      INSERT INTO work_order_items (work_order_id, description, quantity, unit_price, item_type)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO work_order_items (work_order_id, description, quantity, customer_price, workshop_price, item_type)
+      VALUES (?, ?, ?, ?, ?, ?)
     `
     )
-    .run(workOrderId, data.description, quantity, unitPrice, itemType)
+    .run(workOrderId, data.description, quantity, customerPrice, workshopPrice, itemType)
 
-  recalculateTotalCost(workOrderId)
+  recalculateTotals(workOrderId)
 
   const item = db.prepare('SELECT * FROM work_order_items WHERE id = ?').get(Number(result.lastInsertRowid))
   if (!item) {
@@ -402,15 +377,16 @@ export function updateLineItem(itemId: number, data: WorkOrderItemUpdate): WorkO
 
   const description = (data.description ?? existing.description) as string
   const quantity = data.quantity ?? (existing.quantity as number)
-  const unitPrice = data.unit_price ?? (existing.unit_price as number)
+  const customerPrice = data.customer_price ?? (existing.customer_price as number)
+  const workshopPrice = data.workshop_price ?? (existing.workshop_price as number)
   const itemType = (data.item_type ?? existing.item_type) as 'parts' | 'labor'
 
   if (quantity <= 0) {
     throw new Error('Quantity must be greater than zero')
   }
 
-  if (unitPrice < 0) {
-    throw new Error('Unit price must be non-negative')
+  if (customerPrice < 0 || workshopPrice < 0) {
+    throw new Error('Price must be non-negative')
   }
 
   const result = db
@@ -419,19 +395,20 @@ export function updateLineItem(itemId: number, data: WorkOrderItemUpdate): WorkO
       UPDATE work_order_items
       SET description = ?,
           quantity = ?,
-          unit_price = ?,
+          customer_price = ?,
+          workshop_price = ?,
           item_type = ?,
           updated_at = datetime('now')
       WHERE id = ?
     `
     )
-    .run(description, quantity, unitPrice, itemType, itemId)
+    .run(description, quantity, customerPrice, workshopPrice, itemType, itemId)
 
   if (result.changes === 0) {
     throw new Error(`Work order item ${itemId} not updated`)
   }
 
-  recalculateTotalCost(workOrderId)
+  recalculateTotals(workOrderId)
 
   const item = db.prepare('SELECT * FROM work_order_items WHERE id = ?').get(itemId)
   if (!item) {
@@ -462,7 +439,7 @@ export function deleteLineItem(itemId: number): void {
     throw new Error(`Work order item ${itemId} not found`)
   }
 
-  recalculateTotalCost(workOrderId)
+  recalculateTotals(workOrderId)
 }
 
 export const workOrderRepository = {

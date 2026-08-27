@@ -4,22 +4,14 @@ import type {
   QuoteUpdate,
   QuoteFilter,
   QuoteStatus,
+  QuoteItem,
+  QuoteItemCreate,
+  QuoteItemUpdate,
   WorkOrder
 } from '../../shared/types'
 import { getDatabase } from '../connection'
-import { getHourlyRate } from './settingsRepository'
-
-function roundCost(value: number): number {
-  return Math.round(value * 100) / 100
-}
-
-function calculateQuoteTotal(quote: {
-  labor_hours: number
-  hourly_rate: number
-  parts_cost: number
-}): number {
-  return roundCost(quote.labor_hours * quote.hourly_rate + quote.parts_cost)
-}
+import { getHourlyRate, getVatRate } from './settingsRepository'
+import { calcTotals } from '../../shared/calcTotals'
 
 function getTodayPrefix(prefix: string): string {
   const now = new Date()
@@ -60,15 +52,51 @@ function mapRow(row: unknown): Quote {
     description: r.description as string | null,
     labor_hours: Number(r.labor_hours ?? 0),
     hourly_rate: Number(r.hourly_rate ?? 0),
-    parts_cost: Number(r.parts_cost ?? 0),
-    total_cost: Number(r.total_cost ?? 0),
     vat_rate: Number(r.vat_rate ?? 0.21),
-    customer_total: Number(r.customer_total ?? r.total_cost ?? 0),
+    customer_total: Number(r.customer_total ?? 0),
     workshop_total: Number(r.workshop_total ?? 0),
     notes: r.notes as string | null,
     created_at: r.created_at as string,
     updated_at: r.updated_at as string
   }
+}
+
+function mapItemRow(row: unknown): QuoteItem {
+  const r = row as Record<string, unknown>
+  return {
+    id: r.id as number,
+    quote_id: r.quote_id as number,
+    description: r.description as string,
+    quantity: Number(r.quantity ?? 1),
+    customer_price: Number(r.customer_price ?? 0),
+    workshop_price: Number(r.workshop_price ?? 0),
+    item_type: r.item_type as 'parts' | 'labor',
+    created_at: r.created_at as string,
+    updated_at: r.updated_at as string
+  }
+}
+
+function getLineItemsRaw(quoteId: number): QuoteItem[] {
+  const db = getDatabase()
+  const rows = db.prepare('SELECT * FROM quote_items WHERE quote_id = ? ORDER BY id').all(quoteId) as Record<string, unknown>[]
+  return rows.map(mapItemRow)
+}
+
+function recalculateTotals(quoteId: number): void {
+  const db = getDatabase()
+  const quote = getById(quoteId)
+  if (!quote) {
+    throw new Error(`Quote ${quoteId} not found`)
+  }
+
+  const items = getLineItemsRaw(quoteId)
+  const totals = calcTotals(items, quote.labor_hours, quote.hourly_rate, quote.vat_rate)
+
+  db.prepare(
+    `UPDATE quotes
+     SET customer_total = ?, workshop_total = ?, updated_at = datetime('now')
+     WHERE id = ?`
+  ).run(totals.customer_total, totals.workshop_total, quoteId)
 }
 
 export function list(filter?: QuoteFilter): Quote[] {
@@ -102,20 +130,15 @@ export function create(data: QuoteCreate): Quote {
   const date = data.date ?? new Date().toISOString().slice(0, 10)
   const hourlyRate = data.hourly_rate ?? getHourlyRate()
   const laborHours = data.labor_hours ?? 0
-  const partsCost = data.parts_cost ?? 0
-  const totalCost = calculateQuoteTotal({
-    labor_hours: laborHours,
-    hourly_rate: hourlyRate,
-    parts_cost: partsCost
-  })
+  const vatRate = getVatRate()
 
   const quoteNumber = generateNumber(db, 'Q')
 
   const result = db
     .prepare(
       `
-      INSERT INTO quotes (vehicle_id, customer_id, quote_number, date, status, description, labor_hours, hourly_rate, parts_cost, total_cost, notes)
-      VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, ?, ?, ?)
+      INSERT INTO quotes (vehicle_id, customer_id, quote_number, date, status, description, labor_hours, hourly_rate, vat_rate, customer_total, workshop_total, notes)
+      VALUES (?, ?, ?, ?, 'draft', ?, ?, ?, ?, 0, 0, ?)
     `
     )
     .run(
@@ -126,12 +149,14 @@ export function create(data: QuoteCreate): Quote {
       data.description ?? null,
       laborHours,
       hourlyRate,
-      partsCost,
-      totalCost,
+      vatRate,
       data.notes ?? null
     )
 
-  const quote = getById(Number(result.lastInsertRowid))
+  const quoteId = Number(result.lastInsertRowid)
+  recalculateTotals(quoteId)
+
+  const quote = getById(quoteId)
   if (!quote) {
     throw new Error('Failed to create quote')
   }
@@ -156,15 +181,8 @@ export function update(id: number, data: QuoteUpdate): Quote {
   const description = 'description' in data ? data.description : existing.description
   const laborHours = 'labor_hours' in data ? data.labor_hours : existing.labor_hours
   const hourlyRate = 'hourly_rate' in data ? data.hourly_rate : existing.hourly_rate
-  const partsCost = 'parts_cost' in data ? data.parts_cost : existing.parts_cost
   const notes = 'notes' in data ? data.notes : existing.notes
   const status = 'status' in data ? data.status : existing.status
-
-  const totalCost = calculateQuoteTotal({
-    labor_hours: laborHours ?? 0,
-    hourly_rate: hourlyRate ?? 0,
-    parts_cost: partsCost ?? 0
-  })
 
   const result = db
     .prepare(
@@ -176,8 +194,6 @@ export function update(id: number, data: QuoteUpdate): Quote {
           description = ?,
           labor_hours = ?,
           hourly_rate = ?,
-          parts_cost = ?,
-          total_cost = ?,
           notes = ?,
           status = ?,
           updated_at = datetime('now')
@@ -191,8 +207,6 @@ export function update(id: number, data: QuoteUpdate): Quote {
       description ?? null,
       laborHours ?? 0,
       hourlyRate ?? 0,
-      partsCost ?? 0,
-      totalCost,
       notes ?? null,
       status,
       id
@@ -201,6 +215,8 @@ export function update(id: number, data: QuoteUpdate): Quote {
   if (result.changes === 0) {
     throw new Error(`Quote ${id} not updated`)
   }
+
+  recalculateTotals(id)
 
   const quote = getById(id)
   if (!quote) {
@@ -227,6 +243,135 @@ export function remove(id: number): void {
   }
 }
 
+export function getLineItems(quoteId: number): QuoteItem[] {
+  return getLineItemsRaw(quoteId)
+}
+
+export function addLineItem(quoteId: number, data: QuoteItemCreate): QuoteItem {
+  const db = getDatabase()
+
+  const quote = getById(quoteId)
+  if (!quote) {
+    throw new Error(`Quote ${quoteId} not found`)
+  }
+
+  if (quote.status !== 'draft') {
+    throw new Error('Cannot edit line items on a non-draft quote')
+  }
+
+  const quantity = data.quantity ?? 1
+  const customerPrice = data.customer_price ?? 0
+  const workshopPrice = data.workshop_price ?? 0
+  const itemType = data.item_type ?? 'parts'
+
+  if (quantity <= 0) {
+    throw new Error('Quantity must be greater than zero')
+  }
+
+  if (customerPrice < 0 || workshopPrice < 0) {
+    throw new Error('Price must be non-negative')
+  }
+
+  const result = db
+    .prepare(
+      `
+      INSERT INTO quote_items (quote_id, description, quantity, customer_price, workshop_price, item_type)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `
+    )
+    .run(quoteId, data.description, quantity, customerPrice, workshopPrice, itemType)
+
+  recalculateTotals(quoteId)
+
+  const item = db.prepare('SELECT * FROM quote_items WHERE id = ?').get(Number(result.lastInsertRowid))
+  if (!item) {
+    throw new Error('Failed to create quote item')
+  }
+  return mapItemRow(item)
+}
+
+export function updateLineItem(itemId: number, data: QuoteItemUpdate): QuoteItem {
+  const db = getDatabase()
+
+  const existing = db.prepare('SELECT * FROM quote_items WHERE id = ?').get(itemId) as Record<string, unknown> | undefined
+  if (!existing) {
+    throw new Error(`Quote item ${itemId} not found`)
+  }
+
+  const quoteId = existing.quote_id as number
+  const quote = getById(quoteId)
+  if (!quote) {
+    throw new Error(`Quote ${quoteId} not found`)
+  }
+
+  if (quote.status !== 'draft') {
+    throw new Error('Cannot edit line items on a non-draft quote')
+  }
+
+  const description = (data.description ?? existing.description) as string
+  const quantity = data.quantity ?? (existing.quantity as number)
+  const customerPrice = data.customer_price ?? (existing.customer_price as number)
+  const workshopPrice = data.workshop_price ?? (existing.workshop_price as number)
+  const itemType = (data.item_type ?? existing.item_type) as 'parts' | 'labor'
+
+  if (quantity <= 0) {
+    throw new Error('Quantity must be greater than zero')
+  }
+
+  if (customerPrice < 0 || workshopPrice < 0) {
+    throw new Error('Price must be non-negative')
+  }
+
+  const result = db
+    .prepare(
+      `
+      UPDATE quote_items
+      SET description = ?,
+          quantity = ?,
+          customer_price = ?,
+          workshop_price = ?,
+          item_type = ?,
+          updated_at = datetime('now')
+      WHERE id = ?
+    `
+    )
+    .run(description, quantity, customerPrice, workshopPrice, itemType, itemId)
+
+  if (result.changes === 0) {
+    throw new Error(`Quote item ${itemId} not updated`)
+  }
+
+  recalculateTotals(quoteId)
+
+  const item = db.prepare('SELECT * FROM quote_items WHERE id = ?').get(itemId)
+  if (!item) {
+    throw new Error(`Quote item ${itemId} disappeared after update`)
+  }
+  return mapItemRow(item)
+}
+
+export function deleteLineItem(itemId: number): void {
+  const db = getDatabase()
+
+  const existing = db.prepare('SELECT * FROM quote_items WHERE id = ?').get(itemId) as Record<string, unknown> | undefined
+  if (!existing) {
+    throw new Error(`Quote item ${itemId} not found`)
+  }
+
+  const quoteId = existing.quote_id as number
+  const quote = getById(quoteId)
+  if (quote && quote.status !== 'draft') {
+    throw new Error('Cannot edit line items on a non-draft quote')
+  }
+
+  const result = db.prepare('DELETE FROM quote_items WHERE id = ?').run(itemId)
+  if (result.changes === 0) {
+    throw new Error(`Quote item ${itemId} not found`)
+  }
+
+  recalculateTotals(quoteId)
+}
+
 export function convert(id: number): WorkOrder {
   const db = getDatabase()
 
@@ -246,8 +391,16 @@ export function convert(id: number): WorkOrder {
     `
     INSERT INTO work_orders (
       vehicle_id, customer_id, quote_id, order_number, date_in, description,
-      labor_hours, hourly_rate, parts_cost, total_cost, payment_status, notes
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+      labor_hours, hourly_rate, vat_rate, customer_total, workshop_total, payment_status, notes
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)
+  `
+  )
+
+  const insertWorkOrderItem = db.prepare(
+    `
+    INSERT INTO work_order_items (
+      work_order_id, description, quantity, customer_price, workshop_price, item_type
+    ) VALUES (?, ?, ?, ?, ?, ?)
   `
   )
 
@@ -256,6 +409,8 @@ export function convert(id: number): WorkOrder {
     UPDATE quotes SET status = 'converted', updated_at = datetime('now') WHERE id = ?
   `
   )
+
+  const items = getLineItemsRaw(id)
 
   const transaction = db.transaction(() => {
     const result = insertWorkOrder.run(
@@ -267,14 +422,28 @@ export function convert(id: number): WorkOrder {
       quote.description,
       quote.labor_hours,
       quote.hourly_rate,
-      quote.parts_cost,
-      quote.total_cost,
+      quote.vat_rate,
+      quote.customer_total,
+      quote.workshop_total,
       quote.notes
     )
 
+    const workOrderId = Number(result.lastInsertRowid)
+
+    for (const item of items) {
+      insertWorkOrderItem.run(
+        workOrderId,
+        item.description,
+        item.quantity,
+        item.customer_price,
+        item.workshop_price,
+        item.item_type
+      )
+    }
+
     updateQuote.run(id)
 
-    return Number(result.lastInsertRowid)
+    return workOrderId
   })
 
   const workOrderId = transaction()
@@ -297,10 +466,8 @@ export function convert(id: number): WorkOrder {
     description: row.description as string | null,
     labor_hours: Number(row.labor_hours ?? 0),
     hourly_rate: Number(row.hourly_rate ?? 0),
-    parts_cost: Number(row.parts_cost ?? 0),
-    total_cost: Number(row.total_cost ?? 0),
     vat_rate: Number(row.vat_rate ?? 0.21),
-    customer_total: Number(row.customer_total ?? row.total_cost ?? 0),
+    customer_total: Number(row.customer_total ?? 0),
     workshop_total: Number(row.workshop_total ?? 0),
     payment_status: row.payment_status as 'pending' | 'partial' | 'paid',
     notes: row.notes as string | null,
@@ -315,5 +482,9 @@ export const quoteRepository = {
   create,
   update,
   delete: remove,
-  convert
+  convert,
+  getLineItems,
+  addLineItem,
+  updateLineItem,
+  deleteLineItem
 }

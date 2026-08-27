@@ -5,6 +5,9 @@ import type {
   QuoteCreate,
   QuoteFilter,
   QuoteUpdate,
+  QuoteItem,
+  QuoteItemCreate,
+  QuoteItemUpdate,
   WorkOrder
 } from '../../shared/types'
 
@@ -53,6 +56,27 @@ export const useQuoteStore = defineStore('quotes', () => {
     return workOrder
   }
 
+  async function getLineItems(quoteId: number): Promise<QuoteItem[]> {
+    return window.wrenchifyAPI.quotes.getLineItems(quoteId)
+  }
+
+  async function addLineItem(quoteId: number, data: QuoteItemCreate): Promise<QuoteItem> {
+    const item = await window.wrenchifyAPI.quotes.addLineItem(quoteId, data)
+    await load()
+    return item
+  }
+
+  async function updateLineItem(itemId: number, data: QuoteItemUpdate): Promise<QuoteItem> {
+    const item = await window.wrenchifyAPI.quotes.updateLineItem(itemId, data)
+    await load()
+    return item
+  }
+
+  async function deleteLineItem(itemId: number): Promise<void> {
+    await window.wrenchifyAPI.quotes.deleteLineItem(itemId)
+    await load()
+  }
+
   return {
     quotes,
     loading,
@@ -62,6 +86,10 @@ export const useQuoteStore = defineStore('quotes', () => {
     create,
     update,
     remove,
-    convert
+    convert,
+    getLineItems,
+    addLineItem,
+    updateLineItem,
+    deleteLineItem
   }
 })

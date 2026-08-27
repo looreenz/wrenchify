@@ -10,13 +10,16 @@ import * as workOrderRepository from '../../src/db/repositories/workOrderReposit
 import * as paymentRepository from '../../src/db/repositories/paymentRepository'
 import * as settingsRepository from '../../src/db/repositories/settingsRepository'
 
+function loadMigration(filename: string): string {
+  return readFileSync(join(__dirname, `../../src/db/migrations/${filename}`), 'utf-8')
+}
+
 function createTestDatabase(): Database.Database {
   const database = new Database(':memory:')
   setDatabase(database)
 
-  const schemaPath = join(__dirname, '../../src/db/migrations/001_initial.sql')
-  const schema = readFileSync(schemaPath, 'utf-8')
-  database.exec(schema)
+  database.exec(loadMigration('001_initial.sql'))
+  database.exec(loadMigration('002_dual_pricing.sql'))
 
   return database
 }
@@ -45,17 +48,25 @@ describe('settings repository', () => {
     expect(settings.default_language).toBe('it')
     expect(settings.shop_name).toBe('Wrenchify')
     expect(settings.currency).toBe('EUR')
+    expect(settings.vat_rate).toBe(0.21)
   })
 
   it('updates and persists settings', () => {
     settingsRepository.update('hourly_rate', '55')
     settingsRepository.update('shop_name', 'Officina Rossi')
     settingsRepository.update('default_language', 'es')
+    settingsRepository.update('vat_rate', '0.22')
 
     const settings = settingsRepository.getAll()
     expect(settings.hourly_rate).toBe(55)
     expect(settings.shop_name).toBe('Officina Rossi')
     expect(settings.default_language).toBe('es')
+    expect(settings.vat_rate).toBe(0.22)
+  })
+
+  it('returns the configured VAT rate', () => {
+    settingsRepository.update('vat_rate', '0.10')
+    expect(settingsRepository.getVatRate()).toBe(0.10)
   })
 
   it('rejects negative hourly rate', () => {
@@ -68,6 +79,11 @@ describe('settings repository', () => {
 
   it('rejects shop names over 100 characters', () => {
     expect(() => settingsRepository.update('shop_name', 'a'.repeat(101))).toThrow()
+  })
+
+  it('rejects VAT rate outside 0..1', () => {
+    expect(() => settingsRepository.update('vat_rate', '-0.01')).toThrow()
+    expect(() => settingsRepository.update('vat_rate', '1.01')).toThrow()
   })
 })
 
@@ -166,7 +182,7 @@ describe('quote repository', () => {
     expect(second.quote_number).toMatch(/^Q-\d{8}-002$/)
   })
 
-  it('calculates total cost', () => {
+  it('snapshots vat_rate and computes dual totals from line items', () => {
     const customer = seedCustomer()
     const vehicle = seedVehicle(customer.id)
 
@@ -174,11 +190,50 @@ describe('quote repository', () => {
       customer_id: customer.id,
       vehicle_id: vehicle.id,
       labor_hours: 2,
-      hourly_rate: 50,
-      parts_cost: 30
+      hourly_rate: 50
     })
 
-    expect(quote.total_cost).toBe(130)
+    expect(quote.vat_rate).toBe(0.21)
+
+    quoteRepository.addLineItem(quote.id, {
+      description: 'Brake pads',
+      quantity: 2,
+      customer_price: 45,
+      workshop_price: 30,
+      item_type: 'parts'
+    })
+
+    const updated = quoteRepository.getById(quote.id)
+    // labor 2 * 50 = 100 + parts 2 * 45 = 90 => 190 subtotal; * 1.21 = 229.9
+    expect(updated?.customer_total).toBe(229.9)
+    // workshop parts 2 * 30 = 60 * 1.21 = 72.6
+    expect(updated?.workshop_total).toBe(72.6)
+  })
+
+  it('rejects negative or invalid line item input', () => {
+    const customer = seedCustomer()
+    const vehicle = seedVehicle(customer.id)
+    const quote = quoteRepository.create({ customer_id: customer.id, vehicle_id: vehicle.id })
+
+    expect(() =>
+      quoteRepository.addLineItem(quote.id, {
+        description: 'Bad',
+        quantity: -1,
+        customer_price: 10,
+        workshop_price: 5,
+        item_type: 'parts'
+      })
+    ).toThrow()
+
+    expect(() =>
+      quoteRepository.addLineItem(quote.id, {
+        description: 'Bad',
+        quantity: 1,
+        customer_price: -10,
+        workshop_price: 5,
+        item_type: 'parts'
+      })
+    ).toThrow()
   })
 
   it('only allows editing draft quotes', () => {
@@ -190,24 +245,38 @@ describe('quote repository', () => {
     expect(() => quoteRepository.update(quote.id, { labor_hours: 5 })).toThrow()
   })
 
-  it('converts an accepted quote into a work order', () => {
+  it('converts an accepted quote into a work order carrying line items and totals', () => {
     const customer = seedCustomer()
     const vehicle = seedVehicle(customer.id)
     const quote = quoteRepository.create({
       customer_id: customer.id,
       vehicle_id: vehicle.id,
       labor_hours: 2,
-      hourly_rate: 50,
-      parts_cost: 30
+      hourly_rate: 50
     })
 
-    quoteRepository.update(quote.id, { status: 'accepted' })
+    quoteRepository.addLineItem(quote.id, {
+      description: 'Brake pads',
+      quantity: 1,
+      customer_price: 100,
+      workshop_price: 70,
+      item_type: 'parts'
+    })
+
+    const accepted = quoteRepository.update(quote.id, { status: 'accepted' })
     const workOrder = quoteRepository.convert(quote.id)
 
     expect(workOrder.quote_id).toBe(quote.id)
-    expect(workOrder.total_cost).toBe(quote.total_cost)
-    expect(workOrder.hourly_rate).toBe(quote.hourly_rate)
+    expect(workOrder.vat_rate).toBe(accepted.vat_rate)
+    expect(workOrder.customer_total).toBe(accepted.customer_total)
+    expect(workOrder.workshop_total).toBe(accepted.workshop_total)
     expect(quoteRepository.getById(quote.id)?.status).toBe('converted')
+
+    const workOrderItems = workOrderRepository.getLineItems(workOrder.id)
+    expect(workOrderItems).toHaveLength(1)
+    expect(workOrderItems[0].description).toBe('Brake pads')
+    expect(workOrderItems[0].customer_price).toBe(100)
+    expect(workOrderItems[0].workshop_price).toBe(70)
   })
 
   it('rejects conversion of non-accepted quotes', () => {
@@ -235,28 +304,56 @@ describe('work order repository', () => {
     expect(second.order_number).toMatch(/^WO-\d{8}-002$/)
   })
 
-  it('recalculates total cost when line items change', () => {
+  it('recalculates dual totals when dual-priced line items change', () => {
     const customer = seedCustomer()
     const vehicle = seedVehicle(customer.id)
     const workOrder = workOrderRepository.create({
       customer_id: customer.id,
       vehicle_id: vehicle.id,
       labor_hours: 1,
-      hourly_rate: 40,
-      parts_cost: 10
+      hourly_rate: 40
     })
 
-    expect(workOrder.total_cost).toBe(50)
+    expect(workOrder.customer_total).toBe(48.4)
+    expect(workOrder.workshop_total).toBe(0)
 
     workOrderRepository.addLineItem(workOrder.id, {
       description: 'Oil filter',
       quantity: 2,
-      unit_price: 15,
+      customer_price: 15,
+      workshop_price: 10,
       item_type: 'parts'
     })
 
     const updated = workOrderRepository.getById(workOrder.id)
-    expect(updated?.total_cost).toBe(80)
+    // labor 40 + parts 2 * 15 = 30 => 70 * 1.21 = 84.7
+    expect(updated?.customer_total).toBe(84.7)
+    // workshop parts 2 * 10 = 20 * 1.21 = 24.2
+    expect(updated?.workshop_total).toBe(24.2)
+  })
+
+  it('treats labor line items without workshop cost', () => {
+    const customer = seedCustomer()
+    const vehicle = seedVehicle(customer.id)
+    const workOrder = workOrderRepository.create({
+      customer_id: customer.id,
+      vehicle_id: vehicle.id,
+      labor_hours: 0,
+      hourly_rate: 60
+    })
+
+    workOrderRepository.addLineItem(workOrder.id, {
+      description: 'Diagnosis',
+      quantity: 1.5,
+      customer_price: 0,
+      workshop_price: 0,
+      item_type: 'labor'
+    })
+
+    const updated = workOrderRepository.getById(workOrder.id)
+    // labor 1.5 * 60 = 90 * 1.21 = 108.9
+    expect(updated?.customer_total).toBe(108.9)
+    expect(updated?.workshop_total).toBe(0)
   })
 
   it('validates mileage out greater than mileage in', () => {
@@ -285,7 +382,7 @@ describe('work order repository', () => {
 
     paymentRepository.create({
       work_order_id: workOrder.id,
-      amount: 100,
+      amount: 121,
       payment_method: 'cash'
     })
 
@@ -293,7 +390,9 @@ describe('work order repository', () => {
       workOrderRepository.addLineItem(workOrder.id, {
         description: 'Extra',
         quantity: 1,
-        unit_price: 10
+        customer_price: 10,
+        workshop_price: 5,
+        item_type: 'parts'
       })
     ).toThrow()
   })
@@ -316,7 +415,7 @@ describe('payment repository', () => {
 
     paymentRepository.create({
       work_order_id: workOrder.id,
-      amount: 100,
+      amount: 121,
       payment_method: 'cash'
     })
 
@@ -336,7 +435,7 @@ describe('payment repository', () => {
 
     paymentRepository.create({
       work_order_id: workOrder.id,
-      amount: 100,
+      amount: 121,
       payment_method: 'cash'
     })
 
