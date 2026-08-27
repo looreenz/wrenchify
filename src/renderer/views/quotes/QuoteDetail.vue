@@ -184,7 +184,8 @@ async function loadQuote(): Promise<void> {
 
 function rowCustomerTotal(item: QuoteItem): number {
   if (item.item_type === 'labor') {
-    return Math.round(item.quantity * (quote.value?.hourly_rate ?? 0) * (1 + vatRate.value) * 100) / 100
+    // No VAT on labor
+    return Math.round(item.quantity * (quote.value?.hourly_rate ?? 0) * 100) / 100
   }
   return Math.round(item.quantity * item.customer_price * (1 + vatRate.value) * 100) / 100
 }

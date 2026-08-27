@@ -12,7 +12,7 @@ function round2(value: number): number {
  * - Parts items use dual pricing (customer_price / workshop_price).
  * - Labor items use the document hourly_rate; workshop cost for labor is zero.
  * - Document-level labor_hours is added to the labor subtotal.
- * - VAT is applied to both customer and workshop subtotals.
+ * - VAT is applied ONLY to parts (not to labor).
  */
 export function calcTotals(
   items: LineItem[],
@@ -38,20 +38,20 @@ export function calcTotals(
   const documentLaborSubtotal = laborHours * hourlyRate
   const laborSubtotal = documentLaborSubtotal + laborItemSubtotal
 
-  const customerSubtotal = partsCustomerSubtotal + laborSubtotal
-  const workshopSubtotal = partsWorkshopSubtotal
-
-  const customerTotal = round2(customerSubtotal * (1 + vatRate))
-  const workshopTotal = round2(workshopSubtotal * (1 + vatRate))
-  const vatAmount = round2(customerSubtotal * vatRate)
+  // VAT only on parts, not on labor
+  const customerTotal = round2(partsCustomerSubtotal * (1 + vatRate)) + laborSubtotal
+  const workshopTotal = round2(partsWorkshopSubtotal * (1 + vatRate))
+  const partsTotal = round2(partsCustomerSubtotal * (1 + vatRate))
+  const vatAmount = round2(partsCustomerSubtotal * vatRate)
 
   return {
-    customer_subtotal: round2(customerSubtotal),
-    workshop_subtotal: round2(workshopSubtotal),
+    customer_subtotal: round2(partsCustomerSubtotal),
+    workshop_subtotal: round2(partsWorkshopSubtotal),
     labor_subtotal: round2(laborSubtotal),
     vat_amount: vatAmount,
-    customer_total: customerTotal,
-    workshop_total: workshopTotal,
-    net_profit: round2(customerTotal - workshopTotal)
+    customer_total: round2(customerTotal),
+    workshop_total: round2(workshopTotal),
+    parts_total: round2(partsTotal),
+    net_profit: round2(laborSubtotal + partsTotal - workshopTotal)
   }
 }

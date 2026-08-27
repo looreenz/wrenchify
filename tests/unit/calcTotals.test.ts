@@ -33,7 +33,7 @@ describe('calcTotals', () => {
     expect(totals.net_profit).toBe(29.04)
   })
 
-  it('adds document-level labor', () => {
+  it('adds document-level labor without VAT', () => {
     const totals = calcTotals(
       [{ description: 'Filter', quantity: 1, customer_price: 30, workshop_price: 15, item_type: 'parts' }],
       2,
@@ -42,13 +42,14 @@ describe('calcTotals', () => {
     )
 
     expect(totals.labor_subtotal).toBe(100)
-    expect(totals.customer_subtotal).toBe(130)
-    expect(totals.customer_total).toBe(157.3)
+    expect(totals.customer_subtotal).toBe(30) // parts only
+    expect(totals.customer_total).toBe(136.3) // 30 * 1.21 + 100
     expect(totals.workshop_total).toBe(18.15)
-    expect(totals.net_profit).toBe(139.15)
+    expect(totals.parts_total).toBe(36.3) // 30 * 1.21
+    expect(totals.net_profit).toBe(118.15) // 100 + 36.3 - 18.15
   })
 
-  it('treats labor line items with hourly_rate and no workshop cost', () => {
+  it('treats labor line items with hourly_rate and no workshop cost, no VAT on labor', () => {
     const totals = calcTotals(
       [
         { description: 'Parts', quantity: 1, customer_price: 100, workshop_price: 60, item_type: 'parts' },
@@ -60,10 +61,12 @@ describe('calcTotals', () => {
     )
 
     expect(totals.labor_subtotal).toBe(60)
-    expect(totals.customer_subtotal).toBe(160)
+    expect(totals.customer_subtotal).toBe(100) // parts only
     expect(totals.workshop_subtotal).toBe(60)
-    expect(totals.customer_total).toBe(193.6)
+    expect(totals.customer_total).toBe(181) // 100 * 1.21 + 60
     expect(totals.workshop_total).toBe(72.6)
+    expect(totals.parts_total).toBe(121) // 100 * 1.21
+    expect(totals.net_profit).toBe(108.4) // 60 + 121 - 72.6
   })
 
   it('handles zero quantity and zero price', () => {
@@ -94,7 +97,7 @@ describe('calcTotals', () => {
     expect(totals.vat_amount).toBe(0)
   })
 
-  it('handles mixed parts and labor items', () => {
+  it('handles mixed parts and labor items with VAT only on parts', () => {
     const totals = calcTotals(
       [
         { description: 'Pads', quantity: 2, customer_price: 45, workshop_price: 30, item_type: 'parts' },
@@ -105,11 +108,12 @@ describe('calcTotals', () => {
       0.21
     )
 
-    expect(totals.labor_subtotal).toBe(90)
-    expect(totals.customer_subtotal).toBe(180)
-    expect(totals.workshop_subtotal).toBe(60)
-    expect(totals.customer_total).toBe(217.8)
-    expect(totals.workshop_total).toBe(72.6)
-    expect(totals.net_profit).toBe(145.2)
+    expect(totals.labor_subtotal).toBe(90) // 0.5*60 + 1*60
+    expect(totals.customer_subtotal).toBe(90) // parts only: 2*45
+    expect(totals.workshop_subtotal).toBe(60) // parts only: 2*30
+    expect(totals.customer_total).toBe(198.9) // 90 * 1.21 + 90
+    expect(totals.workshop_total).toBe(72.6) // 60 * 1.21
+    expect(totals.parts_total).toBe(108.9) // 90 * 1.21
+    expect(totals.net_profit).toBe(126.3) // 90 + 108.9 - 72.6
   })
 })

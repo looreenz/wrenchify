@@ -248,7 +248,8 @@ function formatCurrency(value: number): string {
 
 function rowCustomerTotal(item: Item): number {
   if (item.item_type === 'labor') {
-    return Math.round(item.quantity * documentHourlyRate.value * (1 + props.vatRate) * 100) / 100
+    // No VAT on labor
+    return Math.round(item.quantity * documentHourlyRate.value * 100) / 100
   }
   return Math.round(item.quantity * item.customer_price * (1 + props.vatRate) * 100) / 100
 }

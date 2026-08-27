@@ -314,6 +314,7 @@ export interface DocumentTotals {
   vat_amount: number
   customer_total: number
   workshop_total: number
+  parts_total: number
   net_profit: number
 }
 

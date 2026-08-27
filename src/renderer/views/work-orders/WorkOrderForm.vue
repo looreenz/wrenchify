@@ -126,7 +126,7 @@
           </div>
           <div class="total-row">
             <strong>{{ $t('workOrder.partsTotal') }}:</strong>
-            {{ formatCurrency(displayTotals.customer_total) }}
+            {{ formatCurrency(displayTotals.parts_total) }}
           </div>
           <div class="total-row">
             <strong>{{ $t('workOrder.workshopTotal') }}:</strong>
@@ -258,7 +258,7 @@ const laborCost = computed(() => {
 })
 
 const netProfit = computed(() => {
-  return displayTotals.value.customer_total - displayTotals.value.workshop_total - laborCost.value
+  return laborCost.value + displayTotals.value.parts_total - displayTotals.value.workshop_total
 })
 
 const displayTotals = computed<DocumentTotals>(() => {

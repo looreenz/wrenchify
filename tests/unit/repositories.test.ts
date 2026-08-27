@@ -204,8 +204,8 @@ describe('quote repository', () => {
     })
 
     const updated = quoteRepository.getById(quote.id)
-    // labor 2 * 50 = 100 + parts 2 * 45 = 90 => 190 subtotal; * 1.21 = 229.9
-    expect(updated?.customer_total).toBe(229.9)
+    // labor 2 * 50 = 100 + parts 2 * 45 = 90 => parts with VAT: 90 * 1.21 = 108.9; customer_total = 100 + 108.9 = 208.9
+    expect(updated?.customer_total).toBe(208.9)
     // workshop parts 2 * 30 = 60 * 1.21 = 72.6
     expect(updated?.workshop_total).toBe(72.6)
   })
@@ -314,7 +314,8 @@ describe('work order repository', () => {
       hourly_rate: 40
     })
 
-    expect(workOrder.customer_total).toBe(48.4)
+    // labor 1 * 40 = 40 (no VAT on labor)
+    expect(workOrder.customer_total).toBe(40)
     expect(workOrder.workshop_total).toBe(0)
 
     workOrderRepository.addLineItem(workOrder.id, {
@@ -326,8 +327,8 @@ describe('work order repository', () => {
     })
 
     const updated = workOrderRepository.getById(workOrder.id)
-    // labor 40 + parts 2 * 15 = 30 => 70 * 1.21 = 84.7
-    expect(updated?.customer_total).toBe(84.7)
+    // labor 40 + parts 2 * 15 = 30 => parts with VAT: 30 * 1.21 = 36.3; customer_total = 40 + 36.3 = 76.3
+    expect(updated?.customer_total).toBe(76.3)
     // workshop parts 2 * 10 = 20 * 1.21 = 24.2
     expect(updated?.workshop_total).toBe(24.2)
   })
@@ -351,8 +352,8 @@ describe('work order repository', () => {
     })
 
     const updated = workOrderRepository.getById(workOrder.id)
-    // labor 1.5 * 60 = 90 * 1.21 = 108.9
-    expect(updated?.customer_total).toBe(108.9)
+    // labor 1.5 * 60 = 90 (no VAT on labor)
+    expect(updated?.customer_total).toBe(90)
     expect(updated?.workshop_total).toBe(0)
   })
 
