@@ -73,7 +73,7 @@ export function recalculatePaymentStatus(workOrderId: number): void {
     .get(workOrderId) as { total: number }
 
   const paidAmount = Number(paymentRow.total)
-  const newStatus = resolvePaymentStatus(workOrder.total_cost, paidAmount)
+  const newStatus = resolvePaymentStatus(workOrder.customer_total, paidAmount)
 
   db.prepare('UPDATE work_orders SET payment_status = ?, updated_at = datetime(\'now\') WHERE id = ?').run(
     newStatus,
@@ -127,6 +127,9 @@ function mapRow(row: unknown): WorkOrder {
     hourly_rate: Number(r.hourly_rate ?? 0),
     parts_cost: Number(r.parts_cost ?? 0),
     total_cost: Number(r.total_cost ?? 0),
+    vat_rate: Number(r.vat_rate ?? 0.21),
+    customer_total: Number(r.customer_total ?? r.total_cost ?? 0),
+    workshop_total: Number(r.workshop_total ?? 0),
     payment_status: r.payment_status as WorkOrderPaymentStatus,
     notes: r.notes as string | null,
     created_at: r.created_at as string,
@@ -142,6 +145,8 @@ function mapItemRow(row: unknown): WorkOrderItem {
     description: r.description as string,
     quantity: Number(r.quantity ?? 1),
     unit_price: Number(r.unit_price ?? 0),
+    customer_price: Number(r.customer_price ?? r.unit_price ?? 0),
+    workshop_price: Number(r.workshop_price ?? 0),
     item_type: r.item_type as 'parts' | 'labor',
     created_at: r.created_at as string,
     updated_at: r.updated_at as string

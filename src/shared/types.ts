@@ -13,6 +13,7 @@ export type SettingKey =
   | 'default_language'
   | 'shop_name'
   | 'currency'
+  | 'vat_rate'
 
 export interface Customer {
   id: number
@@ -107,6 +108,36 @@ export interface VehicleTimelineEntry {
   payment_status: WorkOrderPaymentStatus
 }
 
+export interface QuoteItem {
+  id: number
+  quote_id: number
+  description: string
+  quantity: number
+  customer_price: number
+  workshop_price: number
+  item_type: WorkOrderItemType
+  created_at: string
+  updated_at: string
+}
+
+export interface QuoteItemCreate {
+  description: string
+  quantity?: number
+  customer_price?: number
+  workshop_price?: number
+  item_type?: WorkOrderItemType
+}
+
+export interface QuoteItemUpdate {
+  description?: string
+  quantity?: number
+  customer_price?: number
+  workshop_price?: number
+  item_type?: WorkOrderItemType
+}
+
+// Transitional type: legacy parts_cost/total_cost coexist with dual-pricing fields.
+// Phase 2 will remove the legacy fields once repositories are updated.
 export interface Quote {
   id: number
   vehicle_id: number
@@ -119,6 +150,9 @@ export interface Quote {
   hourly_rate: number
   parts_cost: number
   total_cost: number
+  vat_rate: number
+  customer_total: number
+  workshop_total: number
   notes: string | null
   created_at: string
   updated_at: string
@@ -153,6 +187,8 @@ export interface QuoteFilter {
   status?: QuoteStatus
 }
 
+// Transitional type: legacy parts_cost/total_cost coexist with dual-pricing fields.
+// Phase 2 will remove the legacy fields once repositories are updated.
 export interface WorkOrder {
   id: number
   vehicle_id: number
@@ -168,6 +204,9 @@ export interface WorkOrder {
   hourly_rate: number
   parts_cost: number
   total_cost: number
+  vat_rate: number
+  customer_total: number
+  workshop_total: number
   payment_status: WorkOrderPaymentStatus
   notes: string | null
   created_at: string
@@ -212,12 +251,16 @@ export interface WorkOrderFilter {
   payment_status?: WorkOrderPaymentStatus
 }
 
+// Transitional type: legacy unit_price coexists with dual-pricing fields.
+// Phase 2 will remove unit_price once repositories are updated.
 export interface WorkOrderItem {
   id: number
   work_order_id: number
   description: string
   quantity: number
   unit_price: number
+  customer_price: number
+  workshop_price: number
   item_type: WorkOrderItemType
   created_at: string
   updated_at: string
@@ -227,6 +270,8 @@ export interface WorkOrderItemCreate {
   description: string
   quantity?: number
   unit_price?: number
+  customer_price?: number
+  workshop_price?: number
   item_type?: WorkOrderItemType
 }
 
@@ -234,6 +279,8 @@ export interface WorkOrderItemUpdate {
   description?: string
   quantity?: number
   unit_price?: number
+  customer_price?: number
+  workshop_price?: number
   item_type?: WorkOrderItemType
 }
 
@@ -274,6 +321,17 @@ export interface SettingsMap {
   default_language: Language
   shop_name: string
   currency: string
+  vat_rate: number
+}
+
+export interface DocumentTotals {
+  customer_subtotal: number
+  workshop_subtotal: number
+  labor_subtotal: number
+  vat_amount: number
+  customer_total: number
+  workshop_total: number
+  net_profit: number
 }
 
 export interface WrenchifyAPI {
@@ -304,6 +362,10 @@ export interface WrenchifyAPI {
     update: (id: number, data: QuoteUpdate) => Promise<Quote>
     delete: (id: number) => Promise<void>
     convert: (id: number) => Promise<WorkOrder>
+    getLineItems: (quoteId: number) => Promise<QuoteItem[]>
+    addLineItem: (quoteId: number, data: QuoteItemCreate) => Promise<QuoteItem>
+    updateLineItem: (itemId: number, data: QuoteItemUpdate) => Promise<QuoteItem>
+    deleteLineItem: (itemId: number) => Promise<void>
   }
   workOrders: {
     list: (filter?: WorkOrderFilter) => Promise<WorkOrder[]>

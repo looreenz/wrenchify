@@ -7,7 +7,8 @@ const DEFAULT_SETTINGS: SettingsMap = {
   hourly_rate: 45,
   default_language: 'it',
   shop_name: 'Wrenchify',
-  currency: 'EUR'
+  currency: 'EUR',
+  vat_rate: 0.21
 }
 
 export const useSettingsStore = defineStore('settings', () => {

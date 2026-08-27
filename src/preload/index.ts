@@ -28,7 +28,11 @@ const api: WrenchifyAPI = {
     create: (data) => ipcRenderer.invoke('quotes:create', data),
     update: (id, data) => ipcRenderer.invoke('quotes:update', id, data),
     delete: (id) => ipcRenderer.invoke('quotes:delete', id),
-    convert: (id) => ipcRenderer.invoke('quotes:convert', id)
+    convert: (id) => ipcRenderer.invoke('quotes:convert', id),
+    getLineItems: (quoteId) => ipcRenderer.invoke('quotes:getLineItems', quoteId),
+    addLineItem: (quoteId, data) => ipcRenderer.invoke('quotes:addLineItem', quoteId, data),
+    updateLineItem: (itemId, data) => ipcRenderer.invoke('quotes:updateLineItem', itemId, data),
+    deleteLineItem: (itemId) => ipcRenderer.invoke('quotes:deleteLineItem', itemId)
   },
   workOrders: {
     list: (filter) => ipcRenderer.invoke('workOrders:list', filter),

@@ -5,7 +5,8 @@ const DEFAULT_SETTINGS: SettingsMap = {
   hourly_rate: 45,
   default_language: 'it',
   shop_name: 'Wrenchify',
-  currency: 'EUR'
+  currency: 'EUR',
+  vat_rate: 0.21
 }
 
 export function getAll(): SettingsMap {
@@ -32,6 +33,9 @@ export function getAll(): SettingsMap {
       case 'currency':
         values.currency = row.value
         break
+      case 'vat_rate':
+        values.vat_rate = Number(row.value)
+        break
     }
   }
 
@@ -39,7 +43,8 @@ export function getAll(): SettingsMap {
     hourly_rate: values.hourly_rate ?? DEFAULT_SETTINGS.hourly_rate,
     default_language: values.default_language ?? DEFAULT_SETTINGS.default_language,
     shop_name: values.shop_name ?? DEFAULT_SETTINGS.shop_name,
-    currency: values.currency ?? DEFAULT_SETTINGS.currency
+    currency: values.currency ?? DEFAULT_SETTINGS.currency,
+    vat_rate: values.vat_rate ?? DEFAULT_SETTINGS.vat_rate
   }
 }
 
@@ -67,6 +72,13 @@ export function update(key: SettingKey, value: string): void {
 
   if (key === 'shop_name' && value.length > 100) {
     throw new Error('Shop name must be 100 characters or less')
+  }
+
+  if (key === 'vat_rate') {
+    const num = Number(value)
+    if (Number.isNaN(num) || num < 0 || num > 1) {
+      throw new Error('VAT rate must be between 0 and 1')
+    }
   }
 
   const result = db.prepare('INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = ?').run(key, value, value)
