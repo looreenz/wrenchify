@@ -128,6 +128,10 @@
             <strong>{{ $t('workOrder.partsTotal') }}:</strong>
             {{ formatCurrency(displayTotals.parts_total) }}
           </div>
+          <div class="total-row customer-total-row">
+            <strong>{{ $t('workOrder.customerTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.customer_total) }}
+          </div>
           <div class="total-row">
             <strong>{{ $t('workOrder.workshopTotal') }}:</strong>
             {{ formatCurrency(displayTotals.workshop_total) }}
@@ -492,6 +496,15 @@ function formatCurrency(value: number): string {
   display: flex;
   justify-content: space-between;
   margin-bottom: var(--bi-space-1);
+}
+
+.customer-total-row {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--bi-primary);
+  border-top: 1px solid var(--bi-outline);
+  padding-top: var(--bi-space-1);
+  margin-top: var(--bi-space-1);
 }
 
 .profit-row {

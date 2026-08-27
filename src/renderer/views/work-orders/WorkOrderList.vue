@@ -221,9 +221,9 @@ const columns = computed<DataTableColumns<WorkOrder>>(() => [
   },
   {
     title: t('workOrder.totalCost'),
-    key: 'total_cost',
-    render: (row) => formatCurrency(row.total_cost),
-    sorter: (a, b) => a.total_cost - b.total_cost
+    key: 'customer_total',
+    render: (row) => formatCurrency(row.customer_total),
+    sorter: (a, b) => a.customer_total - b.customer_total
   },
   {
     title: t('workOrder.paymentStatus'),
