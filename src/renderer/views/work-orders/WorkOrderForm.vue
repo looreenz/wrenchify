@@ -125,7 +125,6 @@
         </div>
 
         <LineItemsEditor
-          v-if="workOrderId !== null"
           ref="lineItemsEditorRef"
           :variant="'workOrder'"
           :document-id="workOrderId"

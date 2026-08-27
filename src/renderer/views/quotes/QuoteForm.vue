@@ -100,7 +100,6 @@
         </div>
 
         <LineItemsEditor
-          v-if="quoteId !== null"
           ref="lineItemsEditorRef"
           :variant="'quote'"
           :document-id="quoteId"
