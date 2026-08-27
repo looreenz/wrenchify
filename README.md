@@ -1,97 +1,173 @@
 # Wrenchify
 
-Bilingual desktop application for auto repair shop management. Built with Electron, Vue 3, TypeScript, and Naive UI.
+Auto repair shop management for small businesses. A bilingual (Italian/Spanish) desktop application designed for independent mechanics.
 
 ## Features
 
-- Customer, vehicle, quote, work order, payment, and settings management
-- Bilingual UI (Italian / Spanish)
-- Local SQLite database with manual backup/restore
-- Dark-mode-first Beta Industrial theme
+- **Customer & Vehicle Management** - Complete records with service history
+- **Quotes** - Generate quotes with automatic VAT calculation
+- **Work Orders** - Track repairs with status and time tracking
+- **Payments** - Record partial or full payments with multiple methods
+- **Customer Messages** - Generate conversational messages in the customer's preferred language
+- **Automatic Backup** - Automatic and manual backup support
+- **Bilingual** - Interface in Italian and Spanish
+- **Auto-Updates** - Automatic detection and download of new versions
 
-## Tech Stack
+## System Requirements
 
-- **Frontend framework:** Vue 3 (Composition API, `<script setup>`)
-- **Desktop shell:** Electron
-- **Build tool:** electron-vite
-- **UI library:** Naive UI
-- **State management:** Pinia
-- **Routing:** Vue Router
-- **Icons:** Lucide Vue Next
-- **Testing:** Vitest (unit), Playwright (e2e)
-- **Database:** better-sqlite3
+- **macOS**: 10.15+ (arm64 or x64)
+- **Windows**: 10+ (x64)
+- **Linux**: Ubuntu 18.04+, Fedora 32+, Debian 10+ (x64 or arm64)
 
-## Getting Started
+## Installation
 
-Requirements:
+### From GitHub Releases
 
-- Node.js 20+
-- pnpm
+1. Download the installer for your platform from [Releases](https://github.com/looreenz/wrenchify/releases)
+   - **macOS**: `Wrenchify-*.dmg`
+   - **Windows**: `Wrenchify-*.exe`
+   - **Linux**: `Wrenchify-*.AppImage`
 
-Install dependencies:
+2. Install or run:
+   - **macOS**: Open the DMG and drag to Applications
+   - **Windows**: Run the installer
+   - **Linux**: `chmod +x Wrenchify-*.AppImage && ./Wrenchify-*.AppImage`
+
+### Code Signing Notice
+
+The application is currently not digitally signed:
+- **macOS**: May show a Gatekeeper warning. Right-click → Open the first time
+- **Windows**: SmartScreen may show a warning. Click "More info" → "Run anyway"
+- **Linux**: Works without issues
+
+## Development
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm 8+
+
+### Setup
 
 ```bash
+# Clone the repository
+git clone https://github.com/looreenz/wrenchify.git
+cd wrenchify
+
+# Install dependencies
 pnpm install
-```
 
-Run the app in development mode:
-
-```bash
+# Start development mode
 pnpm dev
 ```
 
-Run unit tests:
+### Main Commands
 
 ```bash
-pnpm test:unit
+# Development
+pnpm dev                    # Start app with hot reload
+
+# Testing
+pnpm test                   # Run unit tests
+pnpm test:coverage          # Tests with coverage report
+
+# Build
+pnpm build                  # Build for production
+pnpm build:mac              # Build for macOS (dmg)
+pnpm build:win              # Build for Windows (exe)
+pnpm build:linux            # Build for Linux (AppImage)
+
+# Cross-architecture build (from macOS)
+npx electron-builder --linux --x64    # Linux x64 from Mac ARM
+npx electron-builder --mac --x64      # macOS x64 from Mac ARM
+
+# Type checking
+pnpm typecheck              # Verify TypeScript types
 ```
 
-Run type checking:
+## Architecture
 
-```bash
-pnpm typecheck
+### Project Structure
+
+```
+wrenchify/
+├── src/
+│   ├── main/              # Electron main process
+│   │   ├── index.ts       # Entry point
+│   │   ├── backup.ts      # Backup logic
+│   │   └── ipc/           # IPC handlers
+│   ├── preload/           # Preload scripts
+│   │   └── index.ts       # Bridge between main and renderer
+│   ├── renderer/          # Vue 3 frontend
+│   │   ├── components/    # Reusable components
+│   │   ├── composables/   # Vue composables
+│   │   ├── stores/        # Pinia stores
+│   │   ├── views/         # Page views
+│   │   └── router.ts      # Route configuration
+│   ├── shared/            # Shared types and utilities
+│   │   ├── types.ts       # TypeScript interfaces
+│   │   └── calcTotals.ts  # Total calculations
+│   ├── db/                # Database layer
+│   │   ├── connection.ts  # SQLite connection
+│   │   ├── migrations/    # SQL migrations
+│   │   └── repositories/  # Entity repositories
+│   └── i18n/              # Translations
+│       ├── it.json        # Italian
+│       └── es.json        # Spanish
+├── tests/                 # Tests
+│   ├── unit/              # Unit tests (Vitest)
+│   └── e2e/               # End-to-end tests (Playwright)
+└── electron-builder.yml   # Build configuration
 ```
 
-Build for production:
+### Patterns Used
 
-```bash
-pnpm build
-```
+- **IPC Pattern**: Main process handles DB, renderer calls via preload
+- **Repository Pattern**: Per-entity repositories with exported functions
+- **Composition API**: Vue 3 with `<script setup lang="ts">`
+- **Pinia Stores**: Reactive state management by domain
 
-## Project Structure
+## Technologies
 
-```text
-src/
-  main/              # Electron main process
-  preload/           # Electron preload scripts
-  renderer/          # Vue application
-    components/      # Vue components
-      industrial/    # Beta Industrial theme components
-    composables/     # Vue composables (e.g. useTheme)
-    layouts/         # Application layouts
-    router.ts        # Vue Router configuration
-    stores/          # Pinia stores
-    styles/tokens/   # CSS design token files
-    theme/           # Naive UI theme overrides
-    views/           # Page-level view components
-  shared/            # Shared types and utilities
-  i18n/              # Internationalization messages
-tests/
-  unit/              # Vitest unit tests
-  e2e/               # Playwright end-to-end tests
-design/              # Design system source files
-```
+- **Electron 33** - Desktop framework
+- **Vue 3** - Frontend framework (Composition API)
+- **TypeScript** - Strict typing
+- **Pinia** - State management
+- **Naive UI** - UI components
+- **better-sqlite3** - SQLite database
+- **vue-i18n** - Internationalization
+- **electron-vite** - Build tool
+- **Vitest** - Unit testing
+- **Playwright** - E2E testing
 
-## Theme System
+## Database Structure
 
-Wrenchify uses the **Beta Industrial** design system. All visual values are expressed as CSS custom properties so the theme can evolve from a single source of truth.
+### Main Tables
 
-- Tokens live in `src/renderer/styles/tokens/`
-- Naive UI overrides live in `src/renderer/theme/betaIndustrial.ts`
-- Reusable industrial components live in `src/renderer/components/industrial/`
+- **customers** - Customers with contact info and preferred language
+- **vehicles** - Vehicles associated with customers
+- **quotes** - Quotes with items and calculations
+- **work_orders** - Work orders with statuses
+- **payments** - Recorded payments
+- **settings** - Application settings
 
-See [`docs/THEME.md`](docs/THEME.md) for the full theme usage guide.
+### VAT Calculation
+
+- **Parts**: VAT applied to customer price
+- **Labor**: No VAT (only cost is charged)
+- **Formula**: `customer_total = parts_with_vat + labor_cost`
+
+## Contributing
+
+This is a personal project, but if you have suggestions or find bugs:
+
+1. Open an issue describing the problem
+2. For code contributions, open a PR with a clear description of changes
 
 ## License
 
 MIT
+
+## Credits
+
+Developed by Lorenzo to help independent auto repair shops manage their work efficiently.

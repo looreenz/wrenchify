@@ -28,4 +28,3 @@ publish:
   provider: github
   owner: looreenz
   repo: wrenchify
-  publish: always

@@ -10,28 +10,40 @@
       @collapse="collapsed = true"
       @expand="collapsed = false"
     >
-      <div class="sidebar-header">
-        <img
-          v-if="collapsed"
-          :src="isotipoImg"
-          alt="Wrenchify"
-          class="sidebar-logo-isotipo"
+      <div class="sidebar-content">
+        <div class="sidebar-header">
+          <img
+            v-if="collapsed"
+            :src="isotipoImg"
+            alt="Wrenchify"
+            class="sidebar-logo-isotipo"
+          />
+          <img
+            v-else
+            :src="logotipoImg"
+            alt="Wrenchify"
+            class="sidebar-logo"
+          />
+        </div>
+        <n-menu
+          :collapsed="collapsed"
+          :collapsed-width="64"
+          :collapsed-icon-size="22"
+          :options="mainMenuOptions"
+          :value="activeKey"
+          @update:value="handleMenuSelect"
         />
-        <img
-          v-else
-          :src="logotipoImg"
-          alt="Wrenchify"
-          class="sidebar-logo"
-        />
+        <div class="sidebar-footer">
+          <n-menu
+            :collapsed="collapsed"
+            :collapsed-width="64"
+            :collapsed-icon-size="22"
+            :options="footerMenuOptions"
+            :value="activeKey"
+            @update:value="handleMenuSelect"
+          />
+        </div>
       </div>
-      <n-menu
-        :collapsed="collapsed"
-        :collapsed-width="64"
-        :collapsed-icon-size="22"
-        :options="menuOptions"
-        :value="activeKey"
-        @update:value="handleMenuSelect"
-      />
     </n-layout-sider>
     <n-layout>
       <n-layout-content class="main-content">
@@ -88,7 +100,7 @@ function renderIcon(icon: typeof Users) {
   return () => h(icon, { size: 18 })
 }
 
-const menuOptions = computed<MenuOption[]>(() => [
+const mainMenuOptions = computed<MenuOption[]>(() => [
   {
     label: t('nav.customers'),
     key: 'CustomerList',
@@ -108,7 +120,10 @@ const menuOptions = computed<MenuOption[]>(() => [
     label: t('nav.workOrders'),
     key: 'WorkOrderList',
     icon: renderIcon(Wrench)
-  },
+  }
+])
+
+const footerMenuOptions = computed<MenuOption[]>(() => [
   {
     label: t('nav.settings'),
     key: 'Settings',
@@ -128,11 +143,17 @@ const menuOptions = computed<MenuOption[]>(() => [
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .main-layout :deep(.n-layout) {
   overflow-y: auto;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .sidebar-header {
@@ -142,6 +163,12 @@ const menuOptions = computed<MenuOption[]>(() => [
   height: 80px;
   padding: 0 var(--bi-space-2);
   border-bottom: var(--bi-border-thin);
+  flex-shrink: 0;
+}
+
+.sidebar-footer {
+  margin-top: auto;
+  border-top: var(--bi-border-thin);
 }
 
 .sidebar-logo {
