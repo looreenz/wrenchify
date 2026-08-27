@@ -105,7 +105,27 @@
           </n-form-item>
         </div>
 
+        <div class="totals-summary">
+          <div class="total-row">
+            <strong>{{ $t('workOrder.laborCost') }}:</strong>
+            {{ formatCurrency(laborCost) }}
+          </div>
+          <div class="total-row">
+            <strong>{{ $t('workOrder.partsTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.customer_total) }}
+          </div>
+          <div class="total-row">
+            <strong>{{ $t('workOrder.workshopTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.workshop_total) }}
+          </div>
+          <div class="total-row profit-row">
+            <strong>{{ $t('workOrder.netProfit') }}:</strong>
+            {{ formatCurrency(netProfit) }}
+          </div>
+        </div>
+
         <LineItemsEditor
+          v-if="workOrderId !== null"
           ref="lineItemsEditorRef"
           :variant="'workOrder'"
           :document-id="workOrderId"
@@ -118,21 +138,6 @@
           @updated="handleLineItemsUpdated"
           @items-changed="handleDraftItemsChanged"
         />
-
-        <div class="totals-summary">
-          <div class="total-row">
-            <strong>{{ $t('workOrder.partsTotal') }}:</strong>
-            {{ formatCurrency(displayTotals.customer_total) }}
-          </div>
-          <div class="total-row">
-            <strong>{{ $t('workOrder.workshopTotal') }}:</strong>
-            {{ formatCurrency(displayTotals.workshop_total) }}
-          </div>
-          <div class="total-row profit-row">
-            <strong>{{ $t('workOrder.netProfit') }}:</strong>
-            {{ formatCurrency(displayTotals.net_profit) }}
-          </div>
-        </div>
 
         <n-form-item :label="$t('workOrder.notes')" path="notes">
           <n-input
@@ -246,6 +251,16 @@ const vehicleOptions = computed(() =>
 )
 
 const vatRate = computed(() => settingsStore.vatRate)
+
+const laborCost = computed(() => {
+  const hours = formValue.labor_hours ?? 0
+  const rate = formValue.hourly_rate ?? 0
+  return hours * rate
+})
+
+const netProfit = computed(() => {
+  return displayTotals.value.customer_total - displayTotals.value.workshop_total - laborCost.value
+})
 
 const displayTotals = computed<DocumentTotals>(() => {
   if (lineItemsTotals.value) {

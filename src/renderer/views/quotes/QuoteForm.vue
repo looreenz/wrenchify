@@ -80,7 +80,27 @@
           </n-form-item>
         </div>
 
+        <div class="totals-summary">
+          <div class="total-row">
+            <strong>{{ $t('quote.laborCost') }}:</strong>
+            {{ formatCurrency(laborCost) }}
+          </div>
+          <div class="total-row">
+            <strong>{{ $t('quote.partsTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.customer_total) }}
+          </div>
+          <div class="total-row">
+            <strong>{{ $t('quote.workshopTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.workshop_total) }}
+          </div>
+          <div class="total-row profit-row">
+            <strong>{{ $t('quote.netProfit') }}:</strong>
+            {{ formatCurrency(netProfit) }}
+          </div>
+        </div>
+
         <LineItemsEditor
+          v-if="quoteId !== null"
           ref="lineItemsEditorRef"
           :variant="'quote'"
           :document-id="quoteId"
@@ -93,21 +113,6 @@
           @updated="handleLineItemsUpdated"
           @items-changed="handleDraftItemsChanged"
         />
-
-        <div class="totals-summary">
-          <div class="total-row">
-            <strong>{{ $t('quote.partsTotal') }}:</strong>
-            {{ formatCurrency(displayTotals.customer_total) }}
-          </div>
-          <div class="total-row">
-            <strong>{{ $t('quote.workshopTotal') }}:</strong>
-            {{ formatCurrency(displayTotals.workshop_total) }}
-          </div>
-          <div class="total-row profit-row">
-            <strong>{{ $t('quote.netProfit') }}:</strong>
-            {{ formatCurrency(displayTotals.net_profit) }}
-          </div>
-        </div>
 
         <n-form-item :label="$t('quote.notes')" path="notes">
           <n-input
@@ -220,6 +225,16 @@ const vehicleOptions = computed(() =>
 )
 
 const vatRate = computed(() => settingsStore.vatRate)
+
+const laborCost = computed(() => {
+  const hours = formValue.labor_hours ?? 0
+  const rate = formValue.hourly_rate ?? 0
+  return hours * rate
+})
+
+const netProfit = computed(() => {
+  return displayTotals.value.customer_total - displayTotals.value.workshop_total - laborCost.value
+})
 
 const displayTotals = computed<DocumentTotals>(() => {
   if (lineItemsTotals.value) {
