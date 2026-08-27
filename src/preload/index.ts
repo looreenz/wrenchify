@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
-import type { WrenchifyAPI } from '../shared/types'
+import type { IpcRendererEvent } from 'electron'
+import type { DownloadProgress, UpdateInfo, WrenchifyAPI } from '../shared/types'
 
 const api: WrenchifyAPI = {
   platform: process.platform,
@@ -58,6 +59,31 @@ const api: WrenchifyAPI = {
   backup: {
     exportManual: () => ipcRenderer.invoke('backup:exportManual'),
     restore: () => ipcRenderer.invoke('backup:restore')
+  },
+  updater: {
+    checkForUpdates: () => ipcRenderer.invoke('updater:checkForUpdates'),
+    downloadUpdate: () => ipcRenderer.invoke('updater:downloadUpdate'),
+    quitAndInstall: () => ipcRenderer.invoke('updater:quitAndInstall'),
+    onUpdateAvailable: (callback: (info: UpdateInfo) => void) => {
+      const listener = (_event: IpcRendererEvent, info: UpdateInfo) => callback(info)
+      ipcRenderer.on('updater:updateAvailable', listener)
+      return () => ipcRenderer.removeListener('updater:updateAvailable', listener)
+    },
+    onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => {
+      const listener = (_event: IpcRendererEvent, info: UpdateInfo) => callback(info)
+      ipcRenderer.on('updater:updateDownloaded', listener)
+      return () => ipcRenderer.removeListener('updater:updateDownloaded', listener)
+    },
+    onUpdateError: (callback: (error: string) => void) => {
+      const listener = (_event: IpcRendererEvent, error: string) => callback(error)
+      ipcRenderer.on('updater:error', listener)
+      return () => ipcRenderer.removeListener('updater:error', listener)
+    },
+    onDownloadProgress: (callback: (progress: DownloadProgress) => void) => {
+      const listener = (_event: IpcRendererEvent, progress: DownloadProgress) => callback(progress)
+      ipcRenderer.on('updater:downloadProgress', listener)
+      return () => ipcRenderer.removeListener('updater:downloadProgress', listener)
+    }
   }
 }
 

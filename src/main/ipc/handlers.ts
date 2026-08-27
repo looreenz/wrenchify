@@ -1,5 +1,12 @@
-import { ipcMain } from 'electron'
+import { BrowserWindow, ipcMain } from 'electron'
 import { exportManualBackup, restoreFromBackup } from '../backup'
+import {
+  checkForUpdates,
+  downloadUpdate,
+  getUpdaterStatus,
+  initAutoUpdater,
+  quitAndInstall
+} from '../autoUpdater'
 import * as customerRepository from '../../db/repositories/customerRepository'
 import * as vehicleRepository from '../../db/repositories/vehicleRepository'
 import * as quoteRepository from '../../db/repositories/quoteRepository'
@@ -27,7 +34,9 @@ import type {
   SettingKey
 } from '../../shared/types'
 
-export function registerAllHandlers(): void {
+export function registerAllHandlers(mainWindow: BrowserWindow): void {
+  initAutoUpdater(mainWindow)
+
   ipcMain.handle('customers:list', async (_event, search?: string) => {
     return customerRepository.list(search)
   })
@@ -178,5 +187,18 @@ export function registerAllHandlers(): void {
 
   ipcMain.handle('backup:restore', async () => {
     return restoreFromBackup()
+  })
+
+  ipcMain.handle('updater:checkForUpdates', async () => {
+    await checkForUpdates()
+    return getUpdaterStatus()
+  })
+
+  ipcMain.handle('updater:downloadUpdate', async () => {
+    await downloadUpdate()
+  })
+
+  ipcMain.handle('updater:quitAndInstall', () => {
+    quitAndInstall()
   })
 }

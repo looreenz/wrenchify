@@ -44,13 +44,16 @@ function createWindow(): void {
 app.whenReady().then(async () => {
   try {
     await initializeDatabase()
-    registerAllHandlers()
     console.log('[main] Database initialized')
   } catch (error) {
     console.error('[main] Failed to initialize database:', error)
   }
 
   createWindow()
+
+  if (mainWindow) {
+    registerAllHandlers(mainWindow)
+  }
 })
 
 app.on('before-quit', () => {

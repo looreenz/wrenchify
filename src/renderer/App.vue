@@ -1,15 +1,24 @@
 <template>
   <n-config-provider :theme="theme" :theme-overrides="themeOverrides">
     <router-view />
+    <update-notification />
   </n-config-provider>
 </template>
 
 <script setup lang="ts">
 import { NConfigProvider } from 'naive-ui'
+import { onMounted } from 'vue'
 import { useTheme } from './composables/useTheme'
+import { useAutoUpdater } from './composables/useAutoUpdater'
+import UpdateNotification from './components/UpdateNotification.vue'
 import './styles/theme.css'
 
 const { theme, themeOverrides } = useTheme()
+const { checkForUpdates } = useAutoUpdater()
+
+onMounted(() => {
+  checkForUpdates()
+})
 </script>
 
 <style>

@@ -8,6 +8,34 @@ export type PaymentMethod = 'cash' | 'card' | 'transfer'
 
 export type WorkOrderItemType = 'parts' | 'labor'
 
+export type UpdateStatus =
+  | 'checking'
+  | 'available'
+  | 'not-available'
+  | 'downloading'
+  | 'downloaded'
+  | 'error'
+
+export interface UpdateInfo {
+  version: string
+  releaseDate: string
+  releaseNotes?: string
+}
+
+export interface DownloadProgress {
+  percent: number
+  bytesPerSecond: number
+  total: number
+  transferred: number
+}
+
+export interface UpdaterStatus {
+  status: UpdateStatus
+  info: UpdateInfo | null
+  progress: DownloadProgress | null
+  error: string | null
+}
+
 export type SettingKey =
   | 'hourly_rate'
   | 'default_language'
@@ -375,6 +403,15 @@ export interface WrenchifyAPI {
   backup: {
     exportManual: () => Promise<BackupResult>
     restore: () => Promise<BackupResult>
+  }
+  updater: {
+    checkForUpdates: () => Promise<UpdaterStatus>
+    downloadUpdate: () => Promise<void>
+    quitAndInstall: () => Promise<void>
+    onUpdateAvailable: (callback: (info: UpdateInfo) => void) => () => void
+    onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void
+    onUpdateError: (callback: (error: string) => void) => () => void
+    onDownloadProgress: (callback: (progress: DownloadProgress) => void) => () => void
   }
 }
 

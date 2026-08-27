@@ -224,6 +224,15 @@
       "vatRateRange": "L'IVA deve essere compreso tra 0% e 100%"
     }
   },
+  "update": {
+    "title": "Aggiornamento",
+    "available": "Aggiornamento disponibile",
+    "ready": "Aggiornamento pronto",
+    "downloading": "Download aggiornamento",
+    "version": "Versione {version} disponibile",
+    "download": "Scarica aggiornamento",
+    "restart": "Riavvia per aggiornare"
+  },
   "common": {
     "close": "Chiudi",
     "open": "Apri",
