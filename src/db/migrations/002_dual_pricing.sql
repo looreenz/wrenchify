@@ -1,8 +1,6 @@
 -- Dual pricing & VAT foundation migration
 -- Applies: quote_items table, dual-price columns, VAT snapshot, profit visibility
 
-BEGIN;
-
 -- Quote line items (mirrors work_order_items with dual pricing)
 CREATE TABLE IF NOT EXISTS quote_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,5 +71,3 @@ ALTER TABLE work_orders DROP COLUMN total_cost;
 
 -- Configurable VAT rate setting (default 21%)
 INSERT OR IGNORE INTO settings (key, value) VALUES ('vat_rate', '0.21');
-
-COMMIT;
