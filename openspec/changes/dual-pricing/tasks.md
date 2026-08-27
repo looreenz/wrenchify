@@ -12,9 +12,9 @@ Chain strategy: feature-branch-chain
 
 | Unit | PR | Lines | Scope |
 |------|----|-------|-------|
-| 1 | PR 1 | ~260 | Schema + types + calcTotals |
-| 2 | PR 2 | ~330 | Repos + IPC + stores |
-| 3 | PR 3 | ~260 | UI + views + i18n |
+| 1 | PR 1 | ~478 actual (~260 estimated) | Schema + types + calcTotals + tests |
+| 2 | PR 2 | ~595 actual (~330 estimated) | Repos + IPC + stores + tests |
+| 3 | PR 3 | ~576 actual (~260 estimated) | UI + views + i18n + tests |
 
 ## Phase 1: Foundation
 
@@ -37,9 +37,9 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3: Frontend
 
-- [ ] 3.1 Refactor `LineItemsEditor.vue` — `variant` prop; dual price cols; hide `workshop_price` for labor; per-row profit; `calcTotals` summary; emit `DocumentTotals` (~100 lines)
-- [ ] 3.2 Update `QuoteForm.vue` — remove `parts_cost`; embed `LineItemsEditor variant="quote"`; show customer_total/workshop_total/net_profit (~60 lines)
-- [ ] 3.3 Update `WorkOrderForm.vue` — remove `parts_cost`; dual totals + profit display (~40 lines)
-- [ ] 3.4 Update `QuoteDetail.vue` — line items table (customer prices only); hide workshop prices (~35 lines)
-- [ ] 3.5 Update `SettingsView.vue` — add `vat_rate` input (0..1, step 0.01) (~15 lines)
-- [ ] 3.6 Update `it.json` + `es.json` — `lineItem.customerPrice/workshopPrice/profit`, `quote.customerTotal/workshopTotal/netProfit`, `settings.vatRate` (~20 lines)
+- [x] 3.1 Refactor `LineItemsEditor.vue` — `variant` prop; dual price cols; hide `workshop_price` for labor; per-row profit; `calcTotals` summary; emit `DocumentTotals` (~180 lines changed)
+- [x] 3.2 Update `QuoteForm.vue` — remove `parts_cost`; embed `LineItemsEditor variant="quote"`; show customer_total/workshop_total/net_profit (~94 lines changed)
+- [x] 3.3 Update `WorkOrderForm.vue` — remove `parts_cost`; dual totals + profit display (~83 lines changed)
+- [x] 3.4 Update `QuoteDetail.vue` — line items table (customer prices only); hide workshop prices (~122 lines changed)
+- [x] 3.5 Update `SettingsView.vue` — add `vat_rate` input (0-100%, default 21%) (~65 lines changed)
+- [x] 3.6 Update `it.json` + `es.json` — `lineItem.customerPrice/workshopPrice/total`, `quote.customerTotal/workshopTotal/netProfit/vatAmount/items`, `workOrder.customerTotal/workshopTotal/netProfit/vatAmount`, `settings.vatRate` (~32 lines changed)
