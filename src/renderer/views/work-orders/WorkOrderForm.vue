@@ -351,11 +351,13 @@ async function handleSave(): Promise<void> {
   try {
     if (isEdit.value && workOrderId.value !== null) {
       await workOrderStore.update(workOrderId.value, payload as WorkOrderUpdate)
-      void router.push({ name: 'WorkOrderList' })
     } else {
       const created = await workOrderStore.create(payload as WorkOrderCreate)
-      void router.push({ name: 'WorkOrderEdit', params: { id: String(created.id) } })
+      workOrderId.value = created.id
+      paymentStatus.value = created.payment_status
+      workOrderTotalCost.value = created.customer_total
     }
+    void router.push({ name: 'WorkOrderList' })
   } catch {
     window.alert(t('app.error'))
   }
