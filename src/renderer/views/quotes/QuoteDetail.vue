@@ -87,6 +87,9 @@
         </div>
 
         <div class="detail-actions">
+          <n-button type="info" data-testid="quote-copy-message" @click="handleCopyMessage">
+            {{ $t('quote.message.copy') }}
+          </n-button>
           <n-button v-if="quote.status === 'draft'" type="success" data-testid="quote-accept" @click="handleAccept">
             {{ $t('quote.statusAccepted') }}
           </n-button>
@@ -122,7 +125,9 @@ import { useQuoteStore } from '../../stores/quotes'
 import { useCustomerStore } from '../../stores/customers'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useSettingsStore } from '../../stores/settings'
-import type { Quote, QuoteItem, QuoteStatus, WorkOrderItemType } from '../../../shared/types'
+import type { Customer, Quote, QuoteItem, QuoteStatus, WorkOrderItemType } from '../../../shared/types'
+import { buildQuoteMessage } from '../../../shared/buildQuoteMessage'
+import { i18n } from '../../../i18n'
 
 const route = useRoute()
 const router = useRouter()
@@ -149,10 +154,13 @@ const netProfit = computed(() => {
   return Math.round((quote.value.customer_total - quote.value.workshop_total) * 100) / 100
 })
 
+const customer = computed<Customer | undefined>(() =>
+  customerStore.customers.find((c) => c.id === quote.value?.customer_id)
+)
+
 const customerName = computed(() => {
-  const customer = customerStore.customers.find((c) => c.id === quote.value?.customer_id)
-  if (!customer) return ''
-  return `${customer.first_name ?? ''} ${customer.last_name}`.trim()
+  if (!customer.value) return ''
+  return `${customer.value.first_name ?? ''} ${customer.value.last_name}`.trim()
 })
 
 const vehicleName = computed(() => {
@@ -223,6 +231,37 @@ async function handleConvert(): Promise<void> {
     void router.push({ name: 'WorkOrderEdit', params: { id: String(workOrder.id) } })
   } catch {
     window.alert(t('app.error'))
+  }
+}
+
+async function handleCopyMessage(): Promise<void> {
+  if (!quote.value) return
+  const locale = customer.value?.preferred_language ?? 'it'
+  const tc = (key: string, params?: Record<string, string | number>) =>
+    i18n.global.t(key, params ?? {}, { locale })
+
+  const firstName = customer.value?.first_name ?? ''
+  const greeting = firstName
+    ? tc('quote.message.greeting', { name: firstName })
+    : tc('quote.message.greetingGeneric')
+
+  const message = buildQuoteMessage(quote.value, lineItems.value, vehicleName.value, {
+    greeting,
+    intro: tc('quote.message.intro', { vehicle: vehicleName.value }),
+    workLabel: tc('quote.message.workLabel'),
+    partsHeader: tc('quote.message.partsHeader'),
+    laborLabel: tc('quote.message.laborLabel'),
+    laborUnitHours: tc('quote.message.laborUnitHours'),
+    laborUnitRate: tc('quote.message.laborUnitRate'),
+    totalLabel: tc('quote.message.totalLabel'),
+    notesLabel: tc('quote.message.notesLabel'),
+    closing: tc('quote.message.closing')
+  })
+  try {
+    await navigator.clipboard.writeText(message)
+    window.alert(t('quote.message.copied'))
+  } catch {
+    window.alert(t('quote.message.copyError'))
   }
 }
 

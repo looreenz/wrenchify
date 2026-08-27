@@ -117,6 +117,22 @@
     "statusConverted": "Convertido",
     "validation": {
       "vehicleRequired": "El vehículo es obligatorio"
+    },
+    "message": {
+      "copy": "Copiar mensaje",
+      "copied": "Mensaje copiado",
+      "copyError": "No se pudo copiar el mensaje",
+      "greeting": "Hola {name},",
+      "greetingGeneric": "Buenos días,",
+      "intro": "te envío el presupuesto para tu {vehicle}.",
+      "workLabel": "Trabajo",
+      "partsHeader": "Repuestos",
+      "laborLabel": "Mano de obra",
+      "laborUnitHours": "horas",
+      "laborUnitRate": "hora",
+      "totalLabel": "Total",
+      "notesLabel": "Notas",
+      "closing": "Un saludo"
     }
   },
   "workOrder": {
