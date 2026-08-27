@@ -140,24 +140,27 @@
         </div>
       </n-form>
 
-      <template v-if="workOrderId !== null">
-        <LineItemsEditor
-          :variant="'workOrder'"
-          :document-id="workOrderId"
-          :vat-rate="vatRate"
-          :show-workshop-price="true"
-          :read-only="isReadOnly"
-          class="line-items-section"
-          @updated="handleLineItemsUpdated"
-        />
-        <PaymentSection
-          :work-order-id="workOrderId"
-          :total-cost="workOrderTotalCost"
-          :payment-status="paymentStatus"
-          class="payments-section"
-          @updated="handlePaymentUpdated"
-        />
-      </template>
+      <LineItemsEditor
+        ref="lineItemsEditorRef"
+        :variant="'workOrder'"
+        :document-id="workOrderId"
+        :vat-rate="vatRate"
+        :show-workshop-price="true"
+        :read-only="isReadOnly"
+        :labor-hours="formValue.labor_hours"
+        :hourly-rate="formValue.hourly_rate"
+        class="line-items-section"
+        @updated="handleLineItemsUpdated"
+        @items-changed="handleDraftItemsChanged"
+      />
+      <PaymentSection
+        v-if="workOrderId !== null"
+        :work-order-id="workOrderId"
+        :total-cost="workOrderTotalCost"
+        :payment-status="paymentStatus"
+        class="payments-section"
+        @updated="handlePaymentUpdated"
+      />
     </n-spin>
   </div>
 </template>
@@ -195,11 +198,13 @@ const vehicleStore = useVehicleStore()
 const settingsStore = useSettingsStore()
 
 const formRef = ref<FormInst | null>(null)
+const lineItemsEditorRef = ref<InstanceType<typeof LineItemsEditor> | null>(null)
 const loading = ref(false)
 const workOrderId = ref<number | null>(null)
 const workOrderTotalCost = ref(0)
 const paymentStatus = ref<'pending' | 'partial' | 'paid'>('pending')
 const lineItemsTotals = ref<DocumentTotals | null>(null)
+const draftItems = ref<Array<{ description: string; quantity: number; customer_price: number; workshop_price: number; item_type: string }>>([])
 
 const isEdit = computed(() => route.name === 'WorkOrderEdit')
 const isReadOnly = computed(() => false)
@@ -351,13 +356,20 @@ async function handleSave(): Promise<void> {
   try {
     if (isEdit.value && workOrderId.value !== null) {
       await workOrderStore.update(workOrderId.value, payload as WorkOrderUpdate)
+      void router.push({ name: 'WorkOrderList' })
     } else {
       const created = await workOrderStore.create(payload as WorkOrderCreate)
-      workOrderId.value = created.id
-      paymentStatus.value = created.payment_status
-      workOrderTotalCost.value = created.customer_total
+      for (const item of draftItems.value) {
+        await workOrderStore.addLineItem(created.id, {
+          description: item.description,
+          quantity: item.quantity,
+          customer_price: item.customer_price,
+          workshop_price: item.workshop_price,
+          item_type: item.item_type as 'parts' | 'labor'
+        })
+      }
+      void router.push({ name: 'WorkOrderList' })
     }
-    void router.push({ name: 'WorkOrderList' })
   } catch {
     window.alert(t('app.error'))
   }
@@ -384,6 +396,10 @@ function handleLineItemsUpdated(totals: DocumentTotals): void {
   if (workOrderId.value !== null) {
     void refreshWorkOrder()
   }
+}
+
+function handleDraftItemsChanged(items: Array<{ description: string; quantity: number; customer_price: number; workshop_price: number; item_type: string }>): void {
+  draftItems.value = items
 }
 
 function handlePaymentUpdated(): void {

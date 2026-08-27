@@ -123,17 +123,19 @@
         </div>
       </n-form>
 
-      <template v-if="quoteId !== null">
-        <LineItemsEditor
-          :variant="'quote'"
-          :document-id="quoteId"
-          :vat-rate="vatRate"
-          :show-workshop-price="true"
-          :read-only="isReadOnly"
-          class="line-items-section"
-          @updated="handleLineItemsUpdated"
-        />
-      </template>
+      <LineItemsEditor
+        ref="lineItemsEditorRef"
+        :variant="'quote'"
+        :document-id="quoteId"
+        :vat-rate="vatRate"
+        :show-workshop-price="true"
+        :read-only="isReadOnly"
+        :labor-hours="formValue.labor_hours"
+        :hourly-rate="formValue.hourly_rate"
+        class="line-items-section"
+        @updated="handleLineItemsUpdated"
+        @items-changed="handleDraftItemsChanged"
+      />
     </n-spin>
   </div>
 </template>
@@ -172,9 +174,11 @@ const vehicleStore = useVehicleStore()
 const settingsStore = useSettingsStore()
 
 const formRef = ref<FormInst | null>(null)
+const lineItemsEditorRef = ref<InstanceType<typeof LineItemsEditor> | null>(null)
 const loading = ref(false)
 const quoteStatus = ref<string | null>(null)
 const lineItemsTotals = ref<DocumentTotals | null>(null)
+const draftItems = ref<Array<{ description: string; quantity: number; customer_price: number; workshop_price: number; item_type: string }>>([])
 
 const quoteId = computed(() => {
   const id = route.params.id
@@ -314,10 +318,20 @@ async function handleSave(): Promise<void> {
   try {
     if (isEdit.value && quoteId.value !== null) {
       await quoteStore.update(quoteId.value, payload as QuoteUpdate)
+      void router.push({ name: 'QuoteList' })
     } else {
-      await quoteStore.create(payload as QuoteCreate)
+      const created = await quoteStore.create(payload as QuoteCreate)
+      for (const item of draftItems.value) {
+        await quoteStore.addLineItem(created.id, {
+          description: item.description,
+          quantity: item.quantity,
+          customer_price: item.customer_price,
+          workshop_price: item.workshop_price,
+          item_type: item.item_type as 'parts' | 'labor'
+        })
+      }
+      void router.push({ name: 'QuoteList' })
     }
-    void router.push({ name: 'QuoteList' })
   } catch {
     window.alert(t('app.error'))
   }
@@ -337,6 +351,10 @@ function makePayload(): QuoteCreate {
 
 function handleLineItemsUpdated(totals: DocumentTotals): void {
   lineItemsTotals.value = totals
+}
+
+function handleDraftItemsChanged(items: Array<{ description: string; quantity: number; customer_price: number; workshop_price: number; item_type: string }>): void {
+  draftItems.value = items
 }
 
 function formatCurrency(value: number): string {

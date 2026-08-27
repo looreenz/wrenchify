@@ -127,14 +127,17 @@ type Variant = 'quote' | 'workOrder'
 
 const props = defineProps<{
   variant: Variant
-  documentId: number
+  documentId: number | null
   vatRate: number
   showWorkshopPrice: boolean
   readOnly?: boolean
+  laborHours?: number
+  hourlyRate?: number
 }>()
 
 const emit = defineEmits<{
   (e: 'updated', totals: DocumentTotals): void
+  (e: 'items-changed', items: Item[]): void
 }>()
 
 const { t } = useI18n()
@@ -146,6 +149,8 @@ const editingId = ref<number | null>(null)
 const originalItem = ref<Item | null>(null)
 const documentLaborHours = ref(0)
 const documentHourlyRate = ref(0)
+
+const isDraft = computed(() => props.documentId === null)
 
 const titleKey = computed(() =>
   props.variant === 'quote' ? 'quote.items' : 'workOrder.lineItems'
@@ -168,18 +173,45 @@ const totals = computed<DocumentTotals>(() =>
 )
 
 onMounted(() => {
-  void loadItems()
+  if (!isDraft.value) {
+    void loadItems()
+  } else {
+    documentLaborHours.value = props.laborHours ?? 0
+    documentHourlyRate.value = props.hourlyRate ?? 0
+  }
 })
 
-watch(() => props.documentId, () => {
-  void loadItems()
+watch(() => props.documentId, (newId) => {
+  if (newId !== null) {
+    void loadItems()
+  }
+})
+
+watch(() => props.laborHours, (hours) => {
+  if (isDraft.value) {
+    documentLaborHours.value = hours ?? 0
+  }
+})
+
+watch(() => props.hourlyRate, (rate) => {
+  if (isDraft.value) {
+    documentHourlyRate.value = rate ?? 0
+  }
 })
 
 watch(totals, (next) => {
   emit('updated', next)
 }, { immediate: true })
 
+watch(items, () => {
+  if (isDraft.value) {
+    emit('items-changed', items.value)
+  }
+}, { deep: true })
+
 async function loadItems(): Promise<void> {
+  if (props.documentId === null) return
+  
   if (props.variant === 'quote') {
     const quote = await quoteStore.getById(props.documentId)
     if (quote) {
@@ -197,6 +229,12 @@ async function loadItems(): Promise<void> {
   }
 }
 
+function getDraftItems(): Item[] {
+  return items.value
+}
+
+defineExpose({ getDraftItems })
+
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('it-IT', {
     style: 'currency',
@@ -213,8 +251,8 @@ function rowCustomerTotal(item: Item): number {
 
 function handleAdd(): void {
   const newItem: Item = {
-    id: 0,
-    [props.variant === 'quote' ? 'quote_id' : 'work_order_id']: props.documentId,
+    id: isDraft.value ? Date.now() : 0,
+    [props.variant === 'quote' ? 'quote_id' : 'work_order_id']: props.documentId ?? 0,
     description: '',
     quantity: 1,
     customer_price: 0,
@@ -224,7 +262,7 @@ function handleAdd(): void {
     updated_at: ''
   } as Item
   items.value.push(newItem)
-  editingId.value = 0
+  editingId.value = newItem.id
 }
 
 function handleEdit(item: Item): void {
@@ -233,7 +271,14 @@ function handleEdit(item: Item): void {
 }
 
 function handleCancel(): void {
-  if (editingId.value === 0 && originalItem.value === null) {
+  if (isDraft.value && editingId.value !== null) {
+    const index = items.value.findIndex((i) => i.id === editingId.value)
+    if (index !== -1 && items.value[index].description === '' && items.value[index].customer_price === 0) {
+      items.value.splice(index, 1)
+    } else if (originalItem.value) {
+      items.value[index] = { ...originalItem.value }
+    }
+  } else if (editingId.value === 0 && originalItem.value === null) {
     items.value.pop()
   } else if (originalItem.value) {
     const index = items.value.findIndex((i) => i.id === originalItem.value?.id)
@@ -246,6 +291,12 @@ function handleCancel(): void {
 }
 
 async function handleSave(item: Item): Promise<void> {
+  if (isDraft.value) {
+    editingId.value = null
+    originalItem.value = null
+    return
+  }
+  
   try {
     const payload: ItemCreate = {
       description: item.description,
@@ -260,9 +311,9 @@ async function handleSave(item: Item): Promise<void> {
     }
     if (item.id === 0) {
       if (props.variant === 'quote') {
-        await quoteStore.addLineItem(props.documentId, payload as QuoteItemCreate)
+        await quoteStore.addLineItem(props.documentId!, payload as QuoteItemCreate)
       } else {
-        await workOrderStore.addLineItem(props.documentId, payload as WorkOrderItemCreate)
+        await workOrderStore.addLineItem(props.documentId!, payload as WorkOrderItemCreate)
       }
     } else {
       if (props.variant === 'quote') {
@@ -280,6 +331,14 @@ async function handleSave(item: Item): Promise<void> {
 }
 
 async function handleDelete(item: Item): Promise<void> {
+  if (isDraft.value) {
+    const index = items.value.findIndex((i) => i.id === item.id)
+    if (index !== -1) {
+      items.value.splice(index, 1)
+    }
+    return
+  }
+  
   if (!window.confirm(t('app.confirmDelete'))) return
   try {
     if (props.variant === 'quote') {
