@@ -96,7 +96,7 @@
 
         <div class="totals-summary">
           <div class="total-row">
-            <strong>{{ $t('quote.customerTotal') }}:</strong>
+            <strong>{{ $t('quote.partsTotal') }}:</strong>
             {{ formatCurrency(displayTotals.customer_total) }}
           </div>
           <div class="total-row">

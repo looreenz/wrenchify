@@ -121,7 +121,7 @@
 
         <div class="totals-summary">
           <div class="total-row">
-            <strong>{{ $t('workOrder.customerTotal') }}:</strong>
+            <strong>{{ $t('workOrder.partsTotal') }}:</strong>
             {{ formatCurrency(displayTotals.customer_total) }}
           </div>
           <div class="total-row">

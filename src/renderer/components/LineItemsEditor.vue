@@ -87,16 +87,16 @@
 
     <div v-if="items.length > 0" class="line-items-summary">
       <div class="summary-row">
-        <strong>{{ $t('quote.customerTotal') }}:</strong>
-        {{ formatCurrency(totals.customer_total) }}
+        <strong>{{ $t('quote.partsTotal') }}:</strong>
+        {{ formatCurrency(partsTotals.customer_total) }}
       </div>
       <div v-if="showWorkshopPrice" class="summary-row">
         <strong>{{ $t('quote.workshopTotal') }}:</strong>
-        {{ formatCurrency(totals.workshop_total) }}
+        {{ formatCurrency(partsTotals.workshop_total) }}
       </div>
       <div v-if="showWorkshopPrice" class="summary-row profit-row">
         <strong>{{ $t('quote.netProfit') }}:</strong>
-        {{ formatCurrency(totals.net_profit) }}
+        {{ formatCurrency(partsTotals.net_profit) }}
       </div>
     </div>
   </IndustrialCard>
@@ -170,6 +170,11 @@ const totals = computed<DocumentTotals>(() =>
     props.vatRate
   )
 )
+
+const partsTotals = computed<DocumentTotals>(() => {
+  const partsItems = items.value.filter(item => item.item_type === 'parts')
+  return calcTotals(partsItems, 0, 0, props.vatRate)
+})
 
 onMounted(() => {
   if (!isDraft.value) {

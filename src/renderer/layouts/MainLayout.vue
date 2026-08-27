@@ -119,11 +119,20 @@ const menuOptions = computed<MenuOption[]>(() => [
 
 <style scoped>
 .main-layout {
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main-layout :deep(.n-layout-sider) {
   background-color: var(--bi-surface-container);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.main-layout :deep(.n-layout) {
+  overflow-y: auto;
 }
 
 .sidebar-header {
@@ -149,7 +158,6 @@ const menuOptions = computed<MenuOption[]>(() => [
 
 .main-content {
   padding: var(--bi-space-3);
-  min-height: 100vh;
   background-color: var(--bi-bg);
 }
 </style>
