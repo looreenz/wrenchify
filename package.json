@@ -1,6 +1,6 @@
 {
   "name": "wrenchify",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Bilingual desktop app for auto repair shop management",
   "main": "./out/main/index.js",
   "author": "Lorenzo",
