@@ -105,6 +105,20 @@
           </n-form-item>
         </div>
 
+        <LineItemsEditor
+          ref="lineItemsEditorRef"
+          :variant="'workOrder'"
+          :document-id="workOrderId"
+          :vat-rate="vatRate"
+          :show-workshop-price="true"
+          :read-only="isReadOnly"
+          :labor-hours="formValue.labor_hours"
+          :hourly-rate="formValue.hourly_rate"
+          class="line-items-section"
+          @updated="handleLineItemsUpdated"
+          @items-changed="handleDraftItemsChanged"
+        />
+
         <div class="totals-summary">
           <div class="total-row">
             <strong>{{ $t('workOrder.customerTotal') }}:</strong>
@@ -140,19 +154,6 @@
         </div>
       </n-form>
 
-      <LineItemsEditor
-        ref="lineItemsEditorRef"
-        :variant="'workOrder'"
-        :document-id="workOrderId"
-        :vat-rate="vatRate"
-        :show-workshop-price="true"
-        :read-only="isReadOnly"
-        :labor-hours="formValue.labor_hours"
-        :hourly-rate="formValue.hourly_rate"
-        class="line-items-section"
-        @updated="handleLineItemsUpdated"
-        @items-changed="handleDraftItemsChanged"
-      />
       <PaymentSection
         v-if="workOrderId !== null"
         :work-order-id="workOrderId"
