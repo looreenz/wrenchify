@@ -1,5 +1,5 @@
 <template>
-  <IndustrialCard :title="$t('workOrder.lineItems')" class="line-items-editor">
+  <IndustrialCard :title="$t(titleKey)" class="line-items-editor">
     <template #header-actions>
       <n-button v-if="!readOnly" type="primary" size="small" @click="handleAdd">
         {{ $t('app.new') }}
@@ -30,14 +30,33 @@
           class="item-quantity"
         />
         <n-input-number
-          v-model:value="item.unit_price"
+          v-if="item.item_type === 'parts'"
+          v-model:value="item.customer_price"
           :disabled="readOnly || editingId !== item.id"
           :min="0"
           :precision="2"
-          :placeholder="$t('lineItem.unitPrice')"
+          :placeholder="$t('lineItem.customerPrice')"
           class="item-price"
         />
-        <span class="item-total">{{ formatCurrency(item.quantity * item.unit_price) }}</span>
+        <n-input-number
+          v-if="showWorkshopPrice && item.item_type === 'parts'"
+          v-model:value="item.workshop_price"
+          :disabled="readOnly || editingId !== item.id"
+          :min="0"
+          :precision="2"
+          :placeholder="$t('lineItem.workshopPrice')"
+          class="item-price"
+        />
+        <n-input-number
+          v-if="item.item_type === 'labor'"
+          v-model:value="hourlyRateProxy"
+          disabled
+          :min="0"
+          :precision="2"
+          :placeholder="$t('quote.hourlyRate')"
+          class="item-price"
+        />
+        <span class="item-total">{{ formatCurrency(rowCustomerTotal(item)) }}</span>
       </div>
       <div v-if="!readOnly" class="item-actions">
         <template v-if="editingId === item.id">
@@ -59,9 +78,19 @@
       </div>
     </div>
 
-    <div v-if="items.length > 0" class="line-items-total">
-      <strong>{{ $t('payment.runningTotal') }}:</strong>
-      {{ formatCurrency(itemsTotal) }}
+    <div v-if="items.length > 0" class="line-items-summary">
+      <div class="summary-row">
+        <strong>{{ $t('quote.customerTotal') }}:</strong>
+        {{ formatCurrency(totals.customer_total) }}
+      </div>
+      <div v-if="showWorkshopPrice" class="summary-row">
+        <strong>{{ $t('quote.workshopTotal') }}:</strong>
+        {{ formatCurrency(totals.workshop_total) }}
+      </div>
+      <div v-if="showWorkshopPrice" class="summary-row profit-row">
+        <strong>{{ $t('quote.netProfit') }}:</strong>
+        {{ formatCurrency(totals.net_profit) }}
+      </div>
     </div>
   </IndustrialCard>
 </template>
@@ -77,44 +106,95 @@ import {
   NSelect
 } from 'naive-ui'
 import { useWorkOrderStore } from '../stores/workOrders'
+import { useQuoteStore } from '../stores/quotes'
 import IndustrialCard from './industrial/IndustrialCard.vue'
-import type { WorkOrderItem, WorkOrderItemCreate, WorkOrderItemType } from '../../shared/types'
+import { calcTotals } from '../../shared/calcTotals'
+import type {
+  DocumentTotals,
+  QuoteItem,
+  QuoteItemCreate,
+  QuoteItemUpdate,
+  WorkOrderItem,
+  WorkOrderItemCreate,
+  WorkOrderItemType,
+  WorkOrderItemUpdate
+} from '../../shared/types'
+
+type Item = QuoteItem | WorkOrderItem
+type ItemCreate = QuoteItemCreate | WorkOrderItemCreate
+type ItemUpdate = QuoteItemUpdate | WorkOrderItemUpdate
+type Variant = 'quote' | 'workOrder'
 
 const props = defineProps<{
-  workOrderId: number
+  variant: Variant
+  documentId: number
+  vatRate: number
+  showWorkshopPrice: boolean
   readOnly?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'updated', total: number): void
+  (e: 'updated', totals: DocumentTotals): void
 }>()
 
 const { t } = useI18n()
 const workOrderStore = useWorkOrderStore()
+const quoteStore = useQuoteStore()
 
-const items = ref<WorkOrderItem[]>([])
+const items = ref<Item[]>([])
 const editingId = ref<number | null>(null)
-const originalItem = ref<WorkOrderItem | null>(null)
+const originalItem = ref<Item | null>(null)
+const documentLaborHours = ref(0)
+const documentHourlyRate = ref(0)
+
+const titleKey = computed(() =>
+  props.variant === 'quote' ? 'quote.items' : 'workOrder.lineItems'
+)
 
 const typeOptions = computed(() => [
   { label: t('lineItem.typeParts'), value: 'parts' as WorkOrderItemType },
   { label: t('lineItem.typeLabor'), value: 'labor' as WorkOrderItemType }
 ])
 
-const itemsTotal = computed(() => {
-  return items.value.reduce((sum, item) => sum + item.quantity * item.unit_price, 0)
-})
+const hourlyRateProxy = computed(() => documentHourlyRate.value)
+
+const totals = computed<DocumentTotals>(() =>
+  calcTotals(
+    items.value,
+    documentLaborHours.value,
+    documentHourlyRate.value,
+    props.vatRate
+  )
+)
 
 onMounted(() => {
   void loadItems()
 })
 
-watch(() => props.workOrderId, () => {
+watch(() => props.documentId, () => {
   void loadItems()
 })
 
+watch(totals, (next) => {
+  emit('updated', next)
+}, { immediate: true })
+
 async function loadItems(): Promise<void> {
-  items.value = await workOrderStore.getLineItems(props.workOrderId)
+  if (props.variant === 'quote') {
+    const quote = await quoteStore.getById(props.documentId)
+    if (quote) {
+      documentLaborHours.value = quote.labor_hours ?? 0
+      documentHourlyRate.value = quote.hourly_rate ?? 0
+    }
+    items.value = await quoteStore.getLineItems(props.documentId)
+  } else {
+    const workOrder = await workOrderStore.getById(props.documentId)
+    if (workOrder) {
+      documentLaborHours.value = workOrder.labor_hours ?? 0
+      documentHourlyRate.value = workOrder.hourly_rate ?? 0
+    }
+    items.value = await workOrderStore.getLineItems(props.documentId)
+  }
 }
 
 function formatCurrency(value: number): string {
@@ -124,22 +204,30 @@ function formatCurrency(value: number): string {
   }).format(value)
 }
 
+function rowCustomerTotal(item: Item): number {
+  if (item.item_type === 'labor') {
+    return Math.round(item.quantity * documentHourlyRate.value * (1 + props.vatRate) * 100) / 100
+  }
+  return Math.round(item.quantity * item.customer_price * (1 + props.vatRate) * 100) / 100
+}
+
 function handleAdd(): void {
-  const newItem: WorkOrderItem = {
+  const newItem: Item = {
     id: 0,
-    work_order_id: props.workOrderId,
+    [props.variant === 'quote' ? 'quote_id' : 'work_order_id']: props.documentId,
     description: '',
     quantity: 1,
-    unit_price: 0,
+    customer_price: 0,
+    workshop_price: 0,
     item_type: 'parts',
     created_at: '',
     updated_at: ''
-  }
+  } as Item
   items.value.push(newItem)
   editingId.value = 0
 }
 
-function handleEdit(item: WorkOrderItem): void {
+function handleEdit(item: Item): void {
   originalItem.value = { ...item }
   editingId.value = item.id
 }
@@ -157,34 +245,49 @@ function handleCancel(): void {
   originalItem.value = null
 }
 
-async function handleSave(item: WorkOrderItem): Promise<void> {
+async function handleSave(item: Item): Promise<void> {
   try {
-    const payload: WorkOrderItemCreate = {
+    const payload: ItemCreate = {
       description: item.description,
       quantity: item.quantity,
-      unit_price: item.unit_price,
-      item_type: item.item_type
+      item_type: item.item_type,
+      ...(item.item_type === 'parts'
+        ? {
+            customer_price: item.customer_price,
+            workshop_price: item.workshop_price
+          }
+        : {})
     }
     if (item.id === 0) {
-      await workOrderStore.addLineItem(props.workOrderId, payload)
+      if (props.variant === 'quote') {
+        await quoteStore.addLineItem(props.documentId, payload as QuoteItemCreate)
+      } else {
+        await workOrderStore.addLineItem(props.documentId, payload as WorkOrderItemCreate)
+      }
     } else {
-      await workOrderStore.updateLineItem(item.id, payload)
+      if (props.variant === 'quote') {
+        await quoteStore.updateLineItem(item.id, payload as QuoteItemUpdate)
+      } else {
+        await workOrderStore.updateLineItem(item.id, payload as WorkOrderItemUpdate)
+      }
     }
     editingId.value = null
     originalItem.value = null
     await loadItems()
-    emit('updated', itemsTotal.value)
   } catch {
     window.alert(t('app.error'))
   }
 }
 
-async function handleDelete(item: WorkOrderItem): Promise<void> {
+async function handleDelete(item: Item): Promise<void> {
   if (!window.confirm(t('app.confirmDelete'))) return
   try {
-    await workOrderStore.deleteLineItem(item.id)
+    if (props.variant === 'quote') {
+      await quoteStore.deleteLineItem(item.id)
+    } else {
+      await workOrderStore.deleteLineItem(item.id)
+    }
     await loadItems()
-    emit('updated', itemsTotal.value)
   } catch {
     window.alert(t('app.error'))
   }
@@ -208,7 +311,7 @@ async function handleDelete(item: WorkOrderItem): Promise<void> {
 
 .item-fields {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
   gap: var(--bi-space-2);
   flex: 1;
   align-items: center;
@@ -242,10 +345,19 @@ async function handleDelete(item: WorkOrderItem): Promise<void> {
   gap: var(--bi-space-1);
 }
 
-.line-items-total {
+.line-items-summary {
   margin-top: var(--bi-space-2);
   text-align: right;
   font-size: 1rem;
   color: var(--bi-on-surface);
+}
+
+.summary-row {
+  margin-top: var(--bi-space-1);
+}
+
+.profit-row {
+  color: var(--bi-success);
+  font-weight: 600;
 }
 </style>

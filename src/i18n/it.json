@@ -97,6 +97,11 @@
     "hourlyRate": "Tariffa oraria",
     "partsCost": "Costo ricambi",
     "totalCost": "Costo totale",
+    "customerTotal": "Totale cliente",
+    "workshopTotal": "Totale officina",
+    "netProfit": "Profitto netto",
+    "vatAmount": "IVA",
+    "items": "Articoli",
     "notes": "Note",
     "vehicle": "Veicolo",
     "customer": "Cliente",
@@ -124,6 +129,10 @@
     "hourlyRate": "Tariffa oraria",
     "partsCost": "Costo ricambi",
     "totalCost": "Costo totale",
+    "customerTotal": "Totale cliente",
+    "workshopTotal": "Totale officina",
+    "netProfit": "Profitto netto",
+    "vatAmount": "IVA",
     "paymentStatus": "Stato pagamento",
     "notes": "Note",
     "vehicle": "Veicolo",
@@ -149,6 +158,9 @@
     "description": "Descrizione",
     "quantity": "Quantità",
     "unitPrice": "Prezzo unitario",
+    "customerPrice": "Prezzo cliente",
+    "workshopPrice": "Prezzo officina",
+    "total": "Totale",
     "type": "Tipo",
     "typeParts": "Ricambi",
     "typeLabor": "Lavoro"
@@ -175,6 +187,7 @@
     "title": "Impostazioni",
     "shopName": "Nome officina",
     "hourlyRate": "Tariffa oraria predefinita",
+    "vatRate": "Aliquota IVA",
     "defaultLanguage": "Lingua predefinita",
     "currency": "Valuta",
     "languageIt": "Italiano",
@@ -184,7 +197,8 @@
     "exportSuccess": "Backup esportato in {path}",
     "restoreSuccess": "Backup ripristinato. L'app verrà riavviata.",
     "validation": {
-      "hourlyRatePositive": "La tariffa oraria deve essere maggiore o uguale a zero"
+      "hourlyRatePositive": "La tariffa oraria deve essere maggiore o uguale a zero",
+      "vatRateRange": "L'IVA deve essere compreso tra 0% e 100%"
     }
   },
   "common": {

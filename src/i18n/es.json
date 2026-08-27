@@ -97,6 +97,11 @@
     "hourlyRate": "Tarifa por hora",
     "partsCost": "Costo de repuestos",
     "totalCost": "Costo total",
+    "customerTotal": "Total cliente",
+    "workshopTotal": "Total taller",
+    "netProfit": "Beneficio neto",
+    "vatAmount": "IVA",
+    "items": "Artículos",
     "notes": "Notas",
     "vehicle": "Vehículo",
     "customer": "Cliente",
@@ -124,6 +129,10 @@
     "hourlyRate": "Tarifa por hora",
     "partsCost": "Costo de repuestos",
     "totalCost": "Costo total",
+    "customerTotal": "Total cliente",
+    "workshopTotal": "Total taller",
+    "netProfit": "Beneficio neto",
+    "vatAmount": "IVA",
     "paymentStatus": "Estado de pago",
     "notes": "Notas",
     "vehicle": "Vehículo",
@@ -149,6 +158,9 @@
     "description": "Descripción",
     "quantity": "Cantidad",
     "unitPrice": "Precio unitario",
+    "customerPrice": "Precio cliente",
+    "workshopPrice": "Precio taller",
+    "total": "Total",
     "type": "Tipo",
     "typeParts": "Repuestos",
     "typeLabor": "Mano de obra"
@@ -175,6 +187,7 @@
     "title": "Configuración",
     "shopName": "Nombre del taller",
     "hourlyRate": "Tarifa por hora predeterminada",
+    "vatRate": "Tasa de IVA",
     "defaultLanguage": "Idioma predeterminado",
     "currency": "Moneda",
     "languageIt": "Italiano",
@@ -184,7 +197,8 @@
     "exportSuccess": "Backup exportado a {path}",
     "restoreSuccess": "Backup restaurado. La aplicación se reiniciará.",
     "validation": {
-      "hourlyRatePositive": "La tarifa por hora debe ser mayor o igual a cero"
+      "hourlyRatePositive": "La tarifa por hora debe ser mayor o igual a cero",
+      "vatRateRange": "El IVA debe estar entre 0% y 100%"
     }
   },
   "common": {

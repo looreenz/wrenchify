@@ -57,7 +57,7 @@
           />
         </n-form-item>
 
-        <div class="form-row form-row-three">
+        <div class="form-row form-row-two">
           <n-form-item :label="$t('quote.laborHours')" path="labor_hours">
             <n-input-number
               v-model:value="formValue.labor_hours"
@@ -78,21 +78,21 @@
               :input-props="{ 'data-testid': 'quote-hourly-rate' }"
             />
           </n-form-item>
-          <n-form-item :label="$t('quote.partsCost')" path="parts_cost">
-            <n-input-number
-              v-model:value="formValue.parts_cost"
-              :disabled="isReadOnly"
-              :min="0"
-              :precision="2"
-              class="number-input"
-              :input-props="{ 'data-testid': 'quote-parts-cost' }"
-            />
-          </n-form-item>
         </div>
 
-        <div class="total-cost">
-          <strong>{{ $t('quote.totalCost') }}:</strong>
-          {{ formatCurrency(totalCost) }}
+        <div class="totals-summary">
+          <div class="total-row">
+            <strong>{{ $t('quote.customerTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.customer_total) }}
+          </div>
+          <div class="total-row">
+            <strong>{{ $t('quote.workshopTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.workshop_total) }}
+          </div>
+          <div class="total-row profit-row">
+            <strong>{{ $t('quote.netProfit') }}:</strong>
+            {{ formatCurrency(displayTotals.net_profit) }}
+          </div>
         </div>
 
         <n-form-item :label="$t('quote.notes')" path="notes">
@@ -122,6 +122,18 @@
           </n-button>
         </div>
       </n-form>
+
+      <template v-if="quoteId !== null">
+        <LineItemsEditor
+          :variant="'quote'"
+          :document-id="quoteId"
+          :vat-rate="vatRate"
+          :show-workshop-price="true"
+          :read-only="isReadOnly"
+          class="line-items-section"
+          @updated="handleLineItemsUpdated"
+        />
+      </template>
     </n-spin>
   </div>
 </template>
@@ -147,7 +159,9 @@ import HazardButton from '../../components/industrial/HazardButton.vue'
 import { useCustomerStore } from '../../stores/customers'
 import { useVehicleStore } from '../../stores/vehicles'
 import { useSettingsStore } from '../../stores/settings'
-import type { QuoteCreate, QuoteUpdate } from '../../../shared/types'
+import LineItemsEditor from '../../components/LineItemsEditor.vue'
+import { calcTotals } from '../../../shared/calcTotals'
+import type { DocumentTotals, QuoteCreate, QuoteUpdate } from '../../../shared/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -160,6 +174,7 @@ const settingsStore = useSettingsStore()
 const formRef = ref<FormInst | null>(null)
 const loading = ref(false)
 const quoteStatus = ref<string | null>(null)
+const lineItemsTotals = ref<DocumentTotals | null>(null)
 
 const quoteId = computed(() => {
   const id = route.params.id
@@ -181,7 +196,6 @@ const formValue = reactive<QuoteCreate & { date: string }>({
   description: '',
   labor_hours: 0,
   hourly_rate: settingsStore.hourlyRate,
-  parts_cost: 0,
   notes: ''
 })
 
@@ -201,10 +215,18 @@ const vehicleOptions = computed(() =>
     }))
 )
 
-const totalCost = computed(() => {
-  const labor = (formValue.labor_hours ?? 0) * (formValue.hourly_rate ?? 0)
-  const parts = formValue.parts_cost ?? 0
-  return Math.round((labor + parts) * 100) / 100
+const vatRate = computed(() => settingsStore.vatRate)
+
+const displayTotals = computed<DocumentTotals>(() => {
+  if (lineItemsTotals.value) {
+    return lineItemsTotals.value
+  }
+  return calcTotals(
+    [],
+    formValue.labor_hours ?? 0,
+    formValue.hourly_rate ?? 0,
+    vatRate.value
+  )
 })
 
 const rules: FormRules = {
@@ -253,7 +275,6 @@ onMounted(async () => {
         formValue.description = quote.description ?? ''
         formValue.labor_hours = quote.labor_hours
         formValue.hourly_rate = quote.hourly_rate
-        formValue.parts_cost = quote.parts_cost
         formValue.notes = quote.notes ?? ''
       }
     } finally {
@@ -310,9 +331,12 @@ function makePayload(): QuoteCreate {
     description: formValue.description || null,
     labor_hours: formValue.labor_hours ?? 0,
     hourly_rate: formValue.hourly_rate ?? 0,
-    parts_cost: formValue.parts_cost ?? 0,
     notes: formValue.notes || null
   }
+}
+
+function handleLineItemsUpdated(totals: DocumentTotals): void {
+  lineItemsTotals.value = totals
 }
 
 function formatCurrency(value: number): string {
@@ -325,7 +349,7 @@ function formatCurrency(value: number): string {
 
 <style scoped>
 .quote-form {
-  max-width: 800px;
+  max-width: 900px;
 }
 
 .page-header {
@@ -341,6 +365,7 @@ function formatCurrency(value: number): string {
   background-color: var(--bi-surface-container-low);
   padding: var(--bi-space-3);
   border-radius: var(--bi-radius-lg);
+  margin-bottom: var(--bi-space-3);
 }
 
 .readonly-alert {
@@ -353,10 +378,8 @@ function formatCurrency(value: number): string {
   gap: var(--bi-space-2);
 }
 
-.form-row-three {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--bi-space-2);
+.form-row-two {
+  grid-template-columns: 1fr 1fr;
 }
 
 .date-picker {
@@ -367,18 +390,33 @@ function formatCurrency(value: number): string {
   width: 100%;
 }
 
-.total-cost {
+.totals-summary {
   font-size: 1.1rem;
   margin-bottom: var(--bi-space-3);
   padding: var(--bi-space-2);
   background-color: var(--bi-surface-container-high);
   border-radius: var(--bi-radius-md);
+  color: var(--bi-on-surface);
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--bi-space-1);
+}
+
+.profit-row {
   color: var(--bi-success);
+  font-weight: 600;
 }
 
 .form-actions {
   display: flex;
   gap: var(--bi-space-2);
   margin-top: var(--bi-space-3);
+}
+
+.line-items-section {
+  margin-bottom: var(--bi-space-3);
 }
 </style>

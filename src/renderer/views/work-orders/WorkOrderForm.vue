@@ -84,7 +84,7 @@
           />
         </n-form-item>
 
-        <div class="form-row form-row-three">
+        <div class="form-row form-row-two">
           <n-form-item :label="$t('workOrder.laborHours')" path="labor_hours">
             <n-input-number
               v-model:value="formValue.labor_hours"
@@ -103,20 +103,21 @@
               class="number-input"
             />
           </n-form-item>
-          <n-form-item :label="$t('workOrder.partsCost')" path="parts_cost">
-            <n-input-number
-              v-model:value="formValue.parts_cost"
-              :disabled="isReadOnly"
-              :min="0"
-              :precision="2"
-              class="number-input"
-            />
-          </n-form-item>
         </div>
 
-        <div class="total-cost">
-          <strong>{{ $t('workOrder.totalCost') }}:</strong>
-          {{ formatCurrency(displayTotalCost) }}
+        <div class="totals-summary">
+          <div class="total-row">
+            <strong>{{ $t('workOrder.customerTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.customer_total) }}
+          </div>
+          <div class="total-row">
+            <strong>{{ $t('workOrder.workshopTotal') }}:</strong>
+            {{ formatCurrency(displayTotals.workshop_total) }}
+          </div>
+          <div class="total-row profit-row">
+            <strong>{{ $t('workOrder.netProfit') }}:</strong>
+            {{ formatCurrency(displayTotals.net_profit) }}
+          </div>
         </div>
 
         <n-form-item :label="$t('workOrder.notes')" path="notes">
@@ -141,7 +142,10 @@
 
       <template v-if="workOrderId !== null">
         <LineItemsEditor
-          :work-order-id="workOrderId"
+          :variant="'workOrder'"
+          :document-id="workOrderId"
+          :vat-rate="vatRate"
+          :show-workshop-price="true"
           :read-only="isReadOnly"
           class="line-items-section"
           @updated="handleLineItemsUpdated"
@@ -179,7 +183,8 @@ import { useVehicleStore } from '../../stores/vehicles'
 import { useSettingsStore } from '../../stores/settings'
 import LineItemsEditor from '../../components/LineItemsEditor.vue'
 import PaymentSection from './PaymentSection.vue'
-import type { WorkOrder, WorkOrderCreate, WorkOrderUpdate } from '../../../shared/types'
+import { calcTotals } from '../../../shared/calcTotals'
+import type { DocumentTotals, WorkOrder, WorkOrderCreate, WorkOrderUpdate } from '../../../shared/types'
 
 const route = useRoute()
 const router = useRouter()
@@ -194,7 +199,7 @@ const loading = ref(false)
 const workOrderId = ref<number | null>(null)
 const workOrderTotalCost = ref(0)
 const paymentStatus = ref<'pending' | 'partial' | 'paid'>('pending')
-const lineItemsTotal = ref(0)
+const lineItemsTotals = ref<DocumentTotals | null>(null)
 
 const isEdit = computed(() => route.name === 'WorkOrderEdit')
 const isReadOnly = computed(() => false)
@@ -215,7 +220,6 @@ const formValue = reactive<WorkOrderCreate & { date_in: string }>({
   description: '',
   labor_hours: 0,
   hourly_rate: settingsStore.hourlyRate,
-  parts_cost: 0,
   notes: ''
 })
 
@@ -235,10 +239,18 @@ const vehicleOptions = computed(() =>
     }))
 )
 
-const displayTotalCost = computed(() => {
-  const labor = (formValue.labor_hours ?? 0) * (formValue.hourly_rate ?? 0)
-  const parts = formValue.parts_cost ?? 0
-  return Math.round((labor + parts + lineItemsTotal.value) * 100) / 100
+const vatRate = computed(() => settingsStore.vatRate)
+
+const displayTotals = computed<DocumentTotals>(() => {
+  if (lineItemsTotals.value) {
+    return lineItemsTotals.value
+  }
+  return calcTotals(
+    [],
+    formValue.labor_hours ?? 0,
+    formValue.hourly_rate ?? 0,
+    vatRate.value
+  )
 })
 
 const rules: FormRules = {
@@ -296,7 +308,7 @@ onMounted(async () => {
       const workOrder = await workOrderStore.getById(workOrderId.value)
       if (workOrder) {
         populateForm(workOrder)
-        workOrderTotalCost.value = workOrder.total_cost
+        workOrderTotalCost.value = workOrder.customer_total
         paymentStatus.value = workOrder.payment_status
       }
     } finally {
@@ -322,7 +334,6 @@ function populateForm(workOrder: WorkOrder): void {
   formValue.description = workOrder.description ?? ''
   formValue.labor_hours = workOrder.labor_hours
   formValue.hourly_rate = workOrder.hourly_rate
-  formValue.parts_cost = workOrder.parts_cost
   formValue.notes = workOrder.notes ?? ''
 }
 
@@ -344,7 +355,7 @@ async function handleSave(): Promise<void> {
       const created = await workOrderStore.create(payload as WorkOrderCreate)
       workOrderId.value = created.id
       paymentStatus.value = created.payment_status
-      workOrderTotalCost.value = created.total_cost
+      workOrderTotalCost.value = created.customer_total
     }
     void router.push({ name: 'WorkOrderList' })
   } catch {
@@ -364,13 +375,12 @@ function makePayload(): WorkOrderCreate {
     description: formValue.description || null,
     labor_hours: formValue.labor_hours ?? 0,
     hourly_rate: formValue.hourly_rate ?? 0,
-    parts_cost: formValue.parts_cost ?? 0,
     notes: formValue.notes || null
   }
 }
 
-function handleLineItemsUpdated(total: number): void {
-  lineItemsTotal.value = total
+function handleLineItemsUpdated(totals: DocumentTotals): void {
+  lineItemsTotals.value = totals
   if (workOrderId.value !== null) {
     void refreshWorkOrder()
   }
@@ -386,7 +396,7 @@ async function refreshWorkOrder(): Promise<void> {
   if (workOrderId.value === null) return
   const workOrder = await workOrderStore.getById(workOrderId.value)
   if (workOrder) {
-    workOrderTotalCost.value = workOrder.total_cost
+    workOrderTotalCost.value = workOrder.customer_total
     paymentStatus.value = workOrder.payment_status
   }
 }
@@ -427,8 +437,8 @@ function formatCurrency(value: number): string {
   gap: var(--bi-space-2);
 }
 
-.form-row-three {
-  grid-template-columns: 1fr 1fr 1fr;
+.form-row-two {
+  grid-template-columns: 1fr 1fr;
 }
 
 .date-picker,
@@ -436,13 +446,24 @@ function formatCurrency(value: number): string {
   width: 100%;
 }
 
-.total-cost {
+.totals-summary {
   font-size: 1.1rem;
   margin-bottom: var(--bi-space-3);
   padding: var(--bi-space-2);
   background-color: var(--bi-surface-container-high);
   border-radius: var(--bi-radius-md);
+  color: var(--bi-on-surface);
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: var(--bi-space-1);
+}
+
+.profit-row {
   color: var(--bi-success);
+  font-weight: 600;
 }
 
 .form-actions {

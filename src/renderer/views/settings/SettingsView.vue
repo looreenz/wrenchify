@@ -15,15 +15,30 @@
           />
         </n-form-item>
 
-        <n-form-item :label="$t('settings.hourlyRate')">
-          <n-input-number
-            v-model:value="form.hourly_rate"
-            :min="0"
-            :precision="2"
-            class="number-input"
-            @update:value="onRateChange"
-          />
-        </n-form-item>
+        <div class="form-row">
+          <n-form-item :label="$t('settings.hourlyRate')">
+            <n-input-number
+              v-model:value="form.hourly_rate"
+              :min="0"
+              :precision="2"
+              class="number-input"
+              @update:value="onRateChange"
+            />
+          </n-form-item>
+
+          <n-form-item :label="$t('settings.vatRate')" :feedback="vatFeedback" :validation-status="vatStatus">
+            <n-input-number
+              v-model:value="form.vat_rate"
+              :min="0"
+              :max="100"
+              :precision="0"
+              class="number-input"
+              @update:value="onVatChange"
+            >
+              <template #suffix>%</template>
+            </n-input-number>
+          </n-form-item>
+        </div>
 
         <n-form-item :label="$t('settings.defaultLanguage')">
           <n-select
@@ -56,7 +71,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   NAlert,
@@ -75,6 +90,7 @@ const settingsStore = useSettingsStore()
 
 const form = reactive({
   hourly_rate: settingsStore.settings.hourly_rate,
+  vat_rate: Math.round(settingsStore.settings.vat_rate * 100),
   default_language: settingsStore.settings.default_language,
   shop_name: settingsStore.settings.shop_name,
   currency: settingsStore.settings.currency
@@ -88,6 +104,15 @@ const languageOptions = [
 const backupMessage = ref<string | null>(null)
 const backupMessageType = ref<'success' | 'error'>('success')
 
+const vatStatus = computed<"error" | undefined>(() => {
+  const value = form.vat_rate
+  return value === null || value < 0 || value > 100 ? 'error' : undefined
+})
+
+const vatFeedback = computed(() => {
+  return vatStatus.value === 'error' ? t('settings.validation.vatRateRange') : undefined
+})
+
 onMounted(() => {
   void settingsStore.load()
 })
@@ -96,6 +121,7 @@ watch(
   () => settingsStore.settings,
   (s) => {
     form.hourly_rate = s.hourly_rate
+    form.vat_rate = Math.round(s.vat_rate * 100)
     form.default_language = s.default_language
     form.shop_name = s.shop_name
     form.currency = s.currency
@@ -111,6 +137,19 @@ function onRateChange(value: number | null): void {
   }
   rateTimeout = setTimeout(() => {
     void settingsStore.update('hourly_rate', String(value ?? 0))
+  }, 300)
+}
+
+let vatTimeout: ReturnType<typeof setTimeout> | null = null
+
+function onVatChange(value: number | null): void {
+  if (vatTimeout) {
+    clearTimeout(vatTimeout)
+  }
+  vatTimeout = setTimeout(() => {
+    const numeric = value ?? 0
+    if (numeric < 0 || numeric > 100) return
+    void settingsStore.update('vat_rate', String(numeric / 100))
   }, 300)
 }
 
@@ -177,6 +216,12 @@ async function handleRestore(): Promise<void> {
   padding: var(--bi-space-3);
   border-radius: var(--bi-radius-lg);
   margin-bottom: var(--bi-space-3);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--bi-space-2);
 }
 
 .number-input {
