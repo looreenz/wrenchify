@@ -10,53 +10,60 @@
 
     <div v-for="(item, index) in items" :key="item.id ?? `draft-${index}`" class="line-item-row">
       <div class="item-fields">
-        <n-input
-          v-model:value="item.description"
-          :disabled="readOnly || editingId !== item.id"
-          :placeholder="$t('lineItem.description')"
-          class="item-description"
-        />
-        <n-select
-          v-model:value="item.item_type"
-          :disabled="readOnly || editingId !== item.id"
-          :options="typeOptions"
-          class="item-type"
-        />
-        <n-input-number
-          v-model:value="item.quantity"
-          :disabled="readOnly || editingId !== item.id"
-          :min="1"
-          :placeholder="$t('lineItem.quantity')"
-          class="item-quantity"
-        />
-        <n-input-number
-          v-if="item.item_type === 'parts'"
-          v-model:value="item.customer_price"
-          :disabled="readOnly || editingId !== item.id"
-          :min="0"
-          :precision="2"
-          :placeholder="$t('lineItem.customerPrice')"
-          class="item-price"
-        />
-        <n-input-number
-          v-if="showWorkshopPrice && item.item_type === 'parts'"
-          v-model:value="item.workshop_price"
-          :disabled="readOnly || editingId !== item.id"
-          :min="0"
-          :precision="2"
-          :placeholder="$t('lineItem.workshopPrice')"
-          class="item-price"
-        />
-        <n-input-number
-          v-if="item.item_type === 'labor'"
-          v-model:value="hourlyRateProxy"
-          disabled
-          :min="0"
-          :precision="2"
-          :placeholder="$t('quote.hourlyRate')"
-          class="item-price"
-        />
-        <span class="item-total">{{ formatCurrency(rowCustomerTotal(item)) }}</span>
+        <div class="field-group">
+          <label class="field-label">{{ $t('lineItem.description') }}</label>
+          <n-input
+            v-model:value="item.description"
+            :disabled="readOnly || editingId !== item.id"
+            :placeholder="$t('lineItem.description')"
+            class="item-description"
+          />
+        </div>
+        <div class="field-group">
+          <label class="field-label">{{ $t('lineItem.quantity') }}</label>
+          <n-input-number
+            v-model:value="item.quantity"
+            :disabled="readOnly || editingId !== item.id"
+            :min="1"
+            :placeholder="$t('lineItem.quantity')"
+            class="item-quantity"
+          />
+        </div>
+        <div class="field-group">
+          <label class="field-label">{{ $t('lineItem.customerPrice') }}</label>
+          <n-input-number
+            v-model:value="item.customer_price"
+            :disabled="readOnly || editingId !== item.id"
+            :min="0"
+            :precision="2"
+            :placeholder="$t('lineItem.customerPrice')"
+            class="item-price"
+          />
+        </div>
+        <div v-if="showWorkshopPrice" class="field-group">
+          <label class="field-label">{{ $t('lineItem.workshopPrice') }}</label>
+          <n-input-number
+            v-model:value="item.workshop_price"
+            :disabled="readOnly || editingId !== item.id"
+            :min="0"
+            :precision="2"
+            :placeholder="$t('lineItem.workshopPrice')"
+            class="item-price"
+          />
+        </div>
+        <div class="field-group totals">
+          <label class="field-label">{{ $t('lineItem.totals') }}</label>
+          <div class="item-totals">
+            <div class="total-line">
+              <span class="total-label">{{ $t('lineItem.customer') }}:</span>
+              <span class="total-value">{{ formatCurrency(rowCustomerTotal(item)) }}</span>
+            </div>
+            <div v-if="showWorkshopPrice" class="total-line">
+              <span class="total-label">{{ $t('lineItem.workshop') }}:</span>
+              <span class="total-value">{{ formatCurrency(rowWorkshopTotal(item)) }}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div v-if="!readOnly" class="item-actions">
         <template v-if="editingId === item.id">
@@ -102,8 +109,7 @@ import {
   NButton,
   NEmpty,
   NInput,
-  NInputNumber,
-  NSelect
+  NInputNumber
 } from 'naive-ui'
 import { useWorkOrderStore } from '../stores/workOrders'
 import { useQuoteStore } from '../stores/quotes'
@@ -155,13 +161,6 @@ const isDraft = computed(() => props.documentId === null)
 const titleKey = computed(() =>
   props.variant === 'quote' ? 'quote.items' : 'workOrder.lineItems'
 )
-
-const typeOptions = computed(() => [
-  { label: t('lineItem.typeParts'), value: 'parts' as WorkOrderItemType },
-  { label: t('lineItem.typeLabor'), value: 'labor' as WorkOrderItemType }
-])
-
-const hourlyRateProxy = computed(() => documentHourlyRate.value)
 
 const totals = computed<DocumentTotals>(() =>
   calcTotals(
@@ -247,6 +246,13 @@ function rowCustomerTotal(item: Item): number {
     return Math.round(item.quantity * documentHourlyRate.value * (1 + props.vatRate) * 100) / 100
   }
   return Math.round(item.quantity * item.customer_price * (1 + props.vatRate) * 100) / 100
+}
+
+function rowWorkshopTotal(item: Item): number {
+  if (item.item_type === 'labor') {
+    return 0
+  }
+  return Math.round(item.quantity * item.workshop_price * (1 + props.vatRate) * 100) / 100
 }
 
 function handleAdd(): void {
@@ -356,59 +362,99 @@ async function handleDelete(item: Item): Promise<void> {
 <style scoped>
 .line-items-editor {
   margin-top: var(--bi-space-3);
+  width: 100%;
 }
 
 .line-item-row {
   display: flex;
   align-items: flex-start;
-  gap: var(--bi-space-2);
-  margin-bottom: var(--bi-space-2);
-  padding: var(--bi-space-2);
+  gap: var(--bi-space-3);
+  margin-bottom: var(--bi-space-3);
+  padding: var(--bi-space-3);
   background-color: var(--bi-surface-container);
   border-radius: var(--bi-radius-md);
 }
 
 .item-fields {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr;
-  gap: var(--bi-space-2);
+  grid-template-columns: 2fr 1fr 1.5fr 1.5fr 2fr;
+  gap: var(--bi-space-3);
   flex: 1;
-  align-items: center;
+  align-items: flex-start;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bi-space-1);
+}
+
+.field-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--bi-on-surface-variant);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .item-description {
-  min-width: 160px;
+  min-width: 200px;
 }
 
-.item-type,
 .item-quantity,
 .item-price {
-  min-width: 100px;
+  min-width: 120px;
 }
 
 .item-quantity,
-.item-price,
-.item-total {
+.item-price {
   font: var(--bi-data-mono);
 }
 
-.item-total {
+.field-group.totals {
+  min-width: 200px;
+}
+
+.item-totals {
+  display: flex;
+  flex-direction: column;
+  gap: var(--bi-space-1);
+  font: var(--bi-data-mono);
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--bi-space-2);
+  font-size: 0.875rem;
+}
+
+.total-label {
+  color: var(--bi-on-surface-variant);
+  font-weight: 500;
+}
+
+.total-value {
   font-weight: 600;
-  text-align: right;
-  white-space: nowrap;
   color: var(--bi-on-surface);
+  white-space: nowrap;
 }
 
 .item-actions {
   display: flex;
   gap: var(--bi-space-1);
+  align-items: flex-end;
+  padding-bottom: var(--bi-space-1);
 }
 
 .line-items-summary {
-  margin-top: var(--bi-space-2);
+  margin-top: var(--bi-space-3);
   text-align: right;
   font-size: 1rem;
   color: var(--bi-on-surface);
+  padding: var(--bi-space-2);
+  background-color: var(--bi-surface-container-low);
+  border-radius: var(--bi-radius-md);
 }
 
 .summary-row {

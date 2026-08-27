@@ -161,6 +161,9 @@
     "customerPrice": "Prezzo cliente",
     "workshopPrice": "Prezzo officina",
     "total": "Totale",
+    "totals": "Totali",
+    "customer": "Cliente",
+    "workshop": "Officina",
     "type": "Tipo",
     "typeParts": "Ricambi",
     "typeLabor": "Lavoro"

@@ -161,6 +161,9 @@
     "customerPrice": "Precio cliente",
     "workshopPrice": "Precio taller",
     "total": "Total",
+    "totals": "Totales",
+    "customer": "Cliente",
+    "workshop": "Taller",
     "type": "Tipo",
     "typeParts": "Repuestos",
     "typeLabor": "Mano de obra"

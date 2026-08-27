@@ -428,7 +428,9 @@ function formatCurrency(value: number): string {
 
 <style scoped>
 .work-order-form {
-  max-width: 900px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .page-header {
