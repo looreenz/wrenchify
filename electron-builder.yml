@@ -14,6 +14,9 @@ extraResources:
       - "**/*"
 mac:
   category: public.app-category.business
+  identity: null
+  hardenedRuntime: false
+  gatekeeperAssess: false
   target:
     - dmg
     - zip

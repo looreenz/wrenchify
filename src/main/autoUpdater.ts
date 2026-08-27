@@ -97,7 +97,7 @@ export function initAutoUpdater(window: BrowserWindow): void {
   console.log('[autoUpdater] Production mode - checking for updates from GitHub...')
   autoUpdater.autoDownload = false
   autoUpdater.allowDowngrade = false
-  autoUpdater.validateUpdateBeforeInstall = false
+  autoUpdater.autoInstallOnAppQuit = false
 
   autoUpdater.on('checking-for-update', () => {
     currentStatus = 'checking'
