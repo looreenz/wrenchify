@@ -82,22 +82,13 @@ export function getUpdaterStatus(): UpdaterStatus {
 export function initAutoUpdater(window: BrowserWindow): void {
   mainWindow = window
 
-  console.log('[autoUpdater] Initializing...', {
-    isDev,
-    NODE_ENV: process.env.NODE_ENV,
-    platform: process.platform,
-    arch: process.arch
-  })
-
   if (isDev) {
     console.log('[autoUpdater] Disabled in development')
     return
   }
 
-  console.log('[autoUpdater] Production mode - checking for updates from GitHub...')
   autoUpdater.autoDownload = false
   autoUpdater.allowDowngrade = false
-  autoUpdater.validateUpdateBeforeInstall = false
 
   autoUpdater.on('checking-for-update', () => {
     currentStatus = 'checking'
