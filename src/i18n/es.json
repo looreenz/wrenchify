@@ -24,6 +24,7 @@
     "no": "No"
   },
   "nav": {
+    "dashboard": "Panel",
     "customers": "Clientes",
     "vehicles": "Vehículos",
     "quotes": "Presupuestos",
@@ -232,6 +233,38 @@
     "version": "Versión {version} disponible",
     "download": "Descargar actualización",
     "restart": "Reiniciar para actualizar"
+  },
+  "dashboard": {
+    "title": "Panel",
+    "kpis": {
+      "monthlyProfit": "Ganancia mensual",
+      "monthlyRevenue": "Ingreso mensual",
+      "pendingWorkOrders": "Órdenes de trabajo pendientes",
+      "quoteConversionRate": "Tasa de conversión de cotizaciones"
+    },
+    "trend": {
+      "title": "Tendencia de ingresos",
+      "months": [
+        "Enero",
+        "Febrero",
+        "Marzo",
+        "Abril",
+        "Mayo",
+        "Junio",
+        "Julio",
+        "Agosto",
+        "Septiembre",
+        "Octubre",
+        "Noviembre",
+        "Diciembre"
+      ]
+    },
+    "empty": "No hay datos disponibles",
+    "mom": {
+      "current": "Mes actual",
+      "previous": "Mes anterior",
+      "change": "Cambio"
+    }
   },
   "common": {
     "close": "Cerrar",
