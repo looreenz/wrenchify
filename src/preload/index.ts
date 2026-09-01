@@ -56,6 +56,10 @@ const api: WrenchifyAPI = {
     getAll: () => ipcRenderer.invoke('settings:getAll'),
     update: (key, value) => ipcRenderer.invoke('settings:update', key, value)
   },
+  dashboard: {
+    getKPIs: (dateRange) => ipcRenderer.invoke('dashboard:getKPIs', dateRange),
+    getRevenueTrend: (endDate) => ipcRenderer.invoke('dashboard:getRevenueTrend', endDate)
+  },
   backup: {
     exportManual: () => ipcRenderer.invoke('backup:exportManual'),
     restore: () => ipcRenderer.invoke('backup:restore')
