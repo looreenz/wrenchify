@@ -346,6 +346,38 @@ export interface DocumentTotals {
   net_profit: number
 }
 
+export interface DateRange {
+  start: string
+  end: string
+}
+
+export interface KPIValue {
+  current: number
+  previous: number | null
+  delta: number | null
+  deltaPercent: number | null
+}
+
+export interface ConversionRateValue {
+  current: number | null
+  previous: number | null
+  delta: number | null
+  deltaPercent: number | null
+}
+
+export interface DashboardKPIs {
+  profit: KPIValue
+  revenue: KPIValue
+  pendingWorkOrders: { count: number }
+  conversionRate: ConversionRateValue
+}
+
+export interface RevenueTrendPoint {
+  month: string
+  label: string
+  revenue: number
+}
+
 export interface WrenchifyAPI {
   platform: string
   versions: {
@@ -412,6 +444,10 @@ export interface WrenchifyAPI {
     onUpdateDownloaded: (callback: (info: UpdateInfo) => void) => () => void
     onUpdateError: (callback: (error: string) => void) => () => void
     onDownloadProgress: (callback: (progress: DownloadProgress) => void) => () => void
+  }
+  dashboard: {
+    getKPIs: (dateRange: DateRange) => Promise<DashboardKPIs>
+    getRevenueTrend: (endDate: string) => Promise<RevenueTrendPoint[]>
   }
 }
 

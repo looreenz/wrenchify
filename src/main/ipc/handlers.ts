@@ -13,6 +13,7 @@ import * as quoteRepository from '../../db/repositories/quoteRepository'
 import * as workOrderRepository from '../../db/repositories/workOrderRepository'
 import * as paymentRepository from '../../db/repositories/paymentRepository'
 import * as settingsRepository from '../../db/repositories/settingsRepository'
+import * as dashboardRepository from '../../db/repositories/dashboardRepository'
 import type {
   CustomerCreate,
   CustomerUpdate,
@@ -31,7 +32,8 @@ import type {
   WorkOrderItemUpdate,
   PaymentCreate,
   PaymentUpdate,
-  SettingKey
+  SettingKey,
+  DateRange
 } from '../../shared/types'
 
 export function registerAllHandlers(mainWindow: BrowserWindow): void {
@@ -200,5 +202,13 @@ export function registerAllHandlers(mainWindow: BrowserWindow): void {
 
   ipcMain.handle('updater:quitAndInstall', () => {
     quitAndInstall()
+  })
+
+  ipcMain.handle('dashboard:getKPIs', async (_event, dateRange: DateRange) => {
+    return dashboardRepository.getKPIs(dateRange.start, dateRange.end)
+  })
+
+  ipcMain.handle('dashboard:getRevenueTrend', async (_event, endDate: string) => {
+    return dashboardRepository.getRevenueTrend(endDate)
   })
 }
