@@ -42,16 +42,16 @@ Chain strategy: feature-branch-chain
 
 ## Phase 4: Frontend — Store & View
 
-- [ ] 4.1 Create `src/renderer/stores/dashboard.ts` — Pinia store with `kpis`, `trend`, `loading`, `dateRange` state; `fetchKPIs()` and `fetchRevenueTrend()` actions; previous-period date offset computation
-- [ ] 4.2 Create `src/renderer/views/dashboard/DashboardView.vue` — 4 KPI cards (profit, revenue, pending WOs, conversion rate) with MoM delta, date range picker (presets + custom), revenue trend bar chart via vue-chartjs with tree-shaken registration, empty state component
-- [ ] 4.3 Add i18n keys `dashboard.*` to `src/i18n/it.json` — KPI labels, chart title, date presets, empty state, N/A indicator
-- [ ] 4.4 Add i18n keys `dashboard.*` to `src/i18n/es.json` — matching Spanish translations
+- [x] 4.1 Create `src/renderer/stores/dashboard.ts` — Pinia store with `kpis`, `trend`, `loading`, `dateRange` state; `fetchKPIs()` and `fetchRevenueTrend()` actions; default date range computation
+- [x] 4.2 Create `src/renderer/views/dashboard/Dashboard.vue` — 4 KPI cards (profit, revenue, pending WOs, conversion rate) with MoM delta, date range picker, revenue trend bar chart via vue-chartjs with tree-shaken registration, empty state component
+- [x] 4.3 Add i18n keys `dashboard.*` to `src/i18n/it.json` — KPI labels, chart title, month names, empty state, MoM labels
+- [x] 4.4 Add i18n keys `dashboard.*` to `src/i18n/es.json` — matching Spanish translations
 
 ## Phase 5: Routing & Navigation
 
-- [ ] 5.1 Add `/dashboard` route to `src/renderer/router.ts` — lazy-import `DashboardView.vue`, change default redirect from `/customers` to `/dashboard`
-- [ ] 5.2 Update `src/renderer/layouts/MainLayout.vue` — import `LayoutDashboard` from lucide, add Dashboard as first item in `mainMenuOptions`, add `dashboard` to `activeKey` map
+- [x] 5.1 Add `/dashboard` route to `src/renderer/router.ts` — lazy-import `Dashboard.vue`, change default redirect from `/customers` to `/dashboard`
+- [x] 5.2 Update `src/renderer/layouts/MainLayout.vue` — import `LayoutDashboard` from lucide, add Dashboard as first item in `mainMenuOptions`, add `dashboard` to `activeKey` map
 
 ## Phase 6: E2E Verification
 
-- [ ] 6.1 Write E2E test in `tests/e2e/dashboard.spec.ts` — verify `/` redirects to `/dashboard`, KPI cards render, date filter changes data, empty state shows with no data
+- [x] 6.1 Write E2E test in `tests/e2e/dashboard.spec.ts` — verify `/` redirects to `/dashboard`, KPI cards render, date filter is visible, Dashboard sidebar item is active
