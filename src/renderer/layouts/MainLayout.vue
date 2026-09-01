@@ -64,6 +64,7 @@ import {
   NMenu
 } from 'naive-ui'
 import {
+  LayoutDashboard,
   Users,
   Car,
   FileText,
@@ -83,13 +84,14 @@ const collapsed = ref(false)
 const activeKey = computed(() => {
   const segment = route.path.split('/')[1]
   const map: Record<string, string> = {
+    dashboard: 'Dashboard',
     customers: 'CustomerList',
     vehicles: 'VehicleList',
     quotes: 'QuoteList',
     'work-orders': 'WorkOrderList',
     settings: 'Settings'
   }
-  return map[segment] || 'CustomerList'
+  return map[segment] || 'Dashboard'
 })
 
 function handleMenuSelect(key: string): void {
@@ -101,6 +103,11 @@ function renderIcon(icon: typeof Users) {
 }
 
 const mainMenuOptions = computed<MenuOption[]>(() => [
+  {
+    label: t('nav.dashboard'),
+    key: 'Dashboard',
+    icon: renderIcon(LayoutDashboard)
+  },
   {
     label: t('nav.customers'),
     key: 'CustomerList',

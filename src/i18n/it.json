@@ -24,6 +24,7 @@
     "no": "No"
   },
   "nav": {
+    "dashboard": "Dashboard",
     "customers": "Clienti",
     "vehicles": "Veicoli",
     "quotes": "Preventivi",
@@ -232,6 +233,38 @@
     "version": "Versione {version} disponibile",
     "download": "Scarica aggiornamento",
     "restart": "Riavvia per aggiornare"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "kpis": {
+      "monthlyProfit": "Profitto mensile",
+      "monthlyRevenue": "Ricavo mensile",
+      "pendingWorkOrders": "Ordini di lavoro in sospeso",
+      "quoteConversionRate": "Tasso di conversione preventivi"
+    },
+    "trend": {
+      "title": "Andamento ricavi",
+      "months": [
+        "Gennaio",
+        "Febbraio",
+        "Marzo",
+        "Aprile",
+        "Maggio",
+        "Giugno",
+        "Luglio",
+        "Agosto",
+        "Settembre",
+        "Ottobre",
+        "Novembre",
+        "Dicembre"
+      ]
+    },
+    "empty": "Nessun dato disponibile",
+    "mom": {
+      "current": "Mese corrente",
+      "previous": "Mese precedente",
+      "change": "Variazione"
+    }
   },
   "common": {
     "close": "Chiudi",
